@@ -14,7 +14,7 @@ Parmis les patterns utilisés on retrouve le pattern observer, le pattern proxy,
 
 + LINUX : Ouvrir le terminal dans le dossier `dist/` et lancez l'exécutable `run.sh`.
 
-
+ 
 ## Règles du jeu
 
 Chaque joueur peut:
