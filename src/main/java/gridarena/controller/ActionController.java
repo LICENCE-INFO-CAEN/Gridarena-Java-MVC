@@ -7,6 +7,7 @@ import java.util.*;
 import gridarena.entity.hero.Hero;
 import gridarena.model.BattlefieldModel;
 import gridarena.utils.ModelListener;
+import gridarena.view.UITheme;
 import gridarena.view.gui.PlayerGUI;
 import gridarena.controller.command.*;
 import gridarena.controller.state.*;
@@ -53,26 +54,26 @@ public class ActionController extends JPanel implements ActionListener, ModelLis
 
     private void createTopButtons(JPanel panel, Hero hero) {
         HashMap<String, Object> buttonValues = new HashMap<>();
-        buttonValues.put("Bouger", "∞");
-        buttonValues.put("Tirer", hero.getAmmoRemaining());
-        buttonValues.put("Mine", hero.getMineRemaining());
-        buttonValues.put("Bombe", hero.getBombRemaining());
-        buttonValues.put("Bouclier", hero.getShieldRemaining());
-        buttonValues.put("Hache", "∞");
-        buttonValues.put("Passer", "∞");
+        buttonValues.put("Bouger",  "∞");
+        buttonValues.put("Tirer",   hero.getAmmoRemaining());
+        buttonValues.put("Mine",    hero.getMineRemaining());
+        buttonValues.put("Bombe",   hero.getBombRemaining());
+        buttonValues.put("Bouclier",hero.getShieldRemaining());
+        buttonValues.put("Hache",   "∞");
+        buttonValues.put("Passer",  "∞");
 
         for (String text : buttonValues.keySet()) {
-            JPanel buttonPanel = new JPanel(new BorderLayout());
+            JPanel buttonPanel = new JPanel(new BorderLayout(0, 2));
             buttonPanel.setOpaque(false);
             JButton button = createButton(text);
             if (text.equals(selectedButton)) {
-                button.setBackground(new Color(245, 158, 11)); // Amber 500
-                button.setForeground(Color.BLACK);
+                button.setBackground(UITheme.ACCENT);
+                button.setForeground(UITheme.TEXT_PRIMARY);
             }
             actionButtons.add(button);
-            JLabel label = new JLabel("Réserve" + ": " + buttonValues.get(text), SwingConstants.CENTER);
-            label.setForeground(new Color(203, 213, 225)); // Slate 300
-            label.setFont(new Font("Segoe UI", Font.PLAIN, 10));
+            JLabel label = new JLabel("" + buttonValues.get(text), SwingConstants.CENTER);
+            label.setForeground(UITheme.TEXT_MUTED);
+            label.setFont(new Font("Segoe UI", Font.PLAIN, 9));
             buttonPanel.add(button, BorderLayout.CENTER);
             buttonPanel.add(label, BorderLayout.SOUTH);
             panel.add(buttonPanel);
@@ -82,13 +83,14 @@ public class ActionController extends JPanel implements ActionListener, ModelLis
 
     private void createMoveButtons(JPanel panel) {
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(3, 3, 3, 3);
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.ipadx = 8;
+        gbc.ipady = 8;
         int[][] positions = {{1, 0}, {2, 1}, {1, 2}, {0, 1}, {0, 0}, {2, 0}, {2, 2}, {0, 2}, {1, 1}};
         String[] directions = {"↑", "→", "↓", "←", "↖", "↗", "↘", "↙", "+"};
         for (int i = 0; i < directions.length; i++) {
-            JButton button = createButton(directions[i]);
-            button.setBackground(new Color(15, 23, 42)); // Slate 900
-            button.setFont(new Font("Segoe UI", Font.BOLD, 14));
+            JButton button = createDirectionButton(directions[i]);
             gbc.gridx = positions[i][0];
             gbc.gridy = positions[i][1];
             panel.add(button, gbc);
@@ -96,49 +98,77 @@ public class ActionController extends JPanel implements ActionListener, ModelLis
         }
     }
 
+    /** Bouton d'action (mode) : fond charcoal, crimson quand actif. */
     private JButton createButton(String text) {
         JButton button = new JButton(text) {
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                
                 Color bg;
-                if (!isEnabled()) {
-                    bg = new Color(51, 65, 85); // Slate 700 (disabled)
-                } else if (getModel().isPressed()) {
-                    bg = getBackground().darker();
-                } else if (getModel().isRollover()) {
-                    bg = getBackground().brighter();
-                } else {
-                    bg = getBackground();
-                }
-
+                if      (!isEnabled())           bg = new Color(0x22, 0x22, 0x24);
+                else if (getModel().isPressed())  bg = getBackground().darker();
+                else if (getModel().isRollover()) bg = getBackground().brighter();
+                else                              bg = getBackground();
                 g2.setColor(bg);
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
-                
-                if (!isEnabled()) {
-                    g2.setColor(new Color(100, 116, 139)); // Slate 500
-                } else {
-                    g2.setColor(getForeground());
+                g2.fillRect(0, 0, getWidth(), getHeight());
+                // Trait d'accentuation gauche pour le bouton actif
+                if (isEnabled() && getBackground().equals(UITheme.ACCENT)) {
+                    g2.setColor(UITheme.ACCENT_HOVER);
+                    g2.fillRect(0, 0, 3, getHeight());
                 }
+                g2.setColor(isEnabled() ? getForeground() : UITheme.TEXT_MUTED);
                 g2.setFont(getFont());
                 FontMetrics fm = g2.getFontMetrics();
-                Rectangle stringBounds = fm.getStringBounds(getText(), g2).getBounds();
-                int textX = (getWidth() - stringBounds.width) / 2;
-                int textY = (getHeight() - stringBounds.height) / 2 + fm.getAscent();
+                int textX = (getWidth()  - fm.stringWidth(getText())) / 2;
+                int textY = (getHeight() + fm.getAscent() - fm.getDescent()) / 2;
                 g2.drawString(getText(), textX, textY);
                 g2.dispose();
             }
         };
-        
         button.setFocusPainted(false);
         button.setBorderPainted(false);
         button.setContentAreaFilled(false);
         button.setOpaque(false);
-        button.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        button.setForeground(new Color(241, 245, 249)); // Slate 100
-        button.setBackground(new Color(71, 85, 105)); // Slate 600 default
+        button.setFont(UITheme.FONT_LABEL);
+        button.setForeground(UITheme.TEXT_PRIMARY);
+        button.setBackground(UITheme.BG_TERTIARY);
+        button.addActionListener(this);
+        return button;
+    }
+
+    /** Bouton de direction : fond sombre, barre crimson basse au survol. */
+    private JButton createDirectionButton(String text) {
+        JButton button = new JButton(text) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                Color bg;
+                if      (!isEnabled())           bg = new Color(0x1A, 0x1A, 0x1C);
+                else if (getModel().isPressed())  bg = UITheme.ACCENT;
+                else if (getModel().isRollover()) bg = UITheme.BG_SECONDARY;
+                else                              bg = UITheme.BG_PRIMARY;
+                g2.setColor(bg);
+                g2.fillRect(0, 0, getWidth(), getHeight());
+                if (isEnabled() && getModel().isRollover()) {
+                    g2.setColor(UITheme.ACCENT);
+                    g2.fillRect(0, getHeight() - 2, getWidth(), 2);
+                }
+                g2.setColor(isEnabled() ? UITheme.TEXT_PRIMARY : UITheme.TEXT_MUTED);
+                g2.setFont(new Font("Segoe UI", Font.BOLD, 15));
+                FontMetrics fm = g2.getFontMetrics();
+                int textX = (getWidth()  - fm.stringWidth(getText())) / 2;
+                int textY = (getHeight() + fm.getAscent() - fm.getDescent()) / 2;
+                g2.drawString(getText(), textX, textY);
+                g2.dispose();
+            }
+        };
+        button.setFocusPainted(false);
+        button.setBorderPainted(false);
+        button.setContentAreaFilled(false);
+        button.setOpaque(false);
+        button.setFont(new Font("Segoe UI", Font.BOLD, 15));
+        button.setForeground(UITheme.TEXT_PRIMARY);
+        button.setBackground(UITheme.BG_PRIMARY);
         button.addActionListener(this);
         return button;
     }
@@ -152,7 +182,13 @@ public class ActionController extends JPanel implements ActionListener, ModelLis
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        this.setBackground(new Color(30, 41, 59)); // Slate 800
+        Graphics2D g2 = (Graphics2D) g.create();
+        g2.setColor(UITheme.BG_SECONDARY);
+        g2.fillRect(0, 0, getWidth(), getHeight());
+        // Bordure droite séparatrice
+        g2.setColor(UITheme.ACCENT);
+        g2.fillRect(getWidth() - 2, 0, 2, getHeight());
+        g2.dispose();
     }
 
     /**
@@ -290,11 +326,11 @@ public class ActionController extends JPanel implements ActionListener, ModelLis
     private void updateButtonColors() {
         for (JButton button : actionButtons) {
             if (button.getText().equals(selectedButton)) {
-                button.setBackground(new Color(245, 158, 11)); // Amber 500
-                button.setForeground(Color.BLACK);
+                button.setBackground(UITheme.ACCENT);
+                button.setForeground(UITheme.TEXT_PRIMARY);
             } else {
-                button.setBackground(new Color(71, 85, 105)); // Slate 600
-                button.setForeground(new Color(241, 245, 249)); // Slate 100
+                button.setBackground(UITheme.BG_TERTIARY);
+                button.setForeground(UITheme.TEXT_SECONDARY);
             }
         }
     }

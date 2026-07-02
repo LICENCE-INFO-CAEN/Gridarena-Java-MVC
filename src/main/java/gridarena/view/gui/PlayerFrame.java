@@ -7,6 +7,7 @@ import gridarena.model.BattlefieldModel;
 import gridarena.view.BattlefieldView;
 import gridarena.view.LeaderboardView;
 import gridarena.view.StatisticView;
+import gridarena.view.UITheme;
 
 import javax.swing.*;
 import java.awt.*;
@@ -32,9 +33,10 @@ public class PlayerFrame extends JFrame {
         this.name = name;
         
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.getRootPane().setBorder(BorderFactory.createMatteBorder(3, 3, 3, 3, Color.BLACK));
+        this.getRootPane().setBorder(BorderFactory.createMatteBorder(3, 3, 3, 3, UITheme.ACCENT));
         this.setSize(800, 600);
         this.setLayout(new BorderLayout());
+        this.getContentPane().setBackground(UITheme.BG_PRIMARY);
         
         HeroSelectionController controllerHeroSelection = new HeroSelectionController(this.battlefield, this.gameController, this.playerGUI);
         this.add(controllerHeroSelection, BorderLayout.CENTER);
@@ -68,11 +70,18 @@ public class PlayerFrame extends JFrame {
     public void showWaitingScreen() {
         this.getContentPane().removeAll();
         JPanel waitPanel = new JPanel(new GridBagLayout());
-        waitPanel.setBackground(new Color(15, 23, 42)); // Slate 900
-        JLabel waitLabel = new JLabel("En attente du choix des autres joueurs...", SwingConstants.CENTER);
-        waitLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        waitLabel.setForeground(new Color(245, 158, 11)); // Amber 500
-        waitPanel.add(waitLabel);
+        waitPanel.setBackground(UITheme.BG_PRIMARY);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0; gbc.gridy = 0; gbc.insets = new Insets(0, 0, 8, 0);
+        JLabel waitLabel = new JLabel("EN ATTENTE", SwingConstants.CENTER);
+        waitLabel.setFont(UITheme.FONT_TITLE);
+        waitLabel.setForeground(UITheme.TEXT_PRIMARY);
+        waitPanel.add(waitLabel, gbc);
+        gbc.gridy = 1;
+        JLabel subLabel = new JLabel("autres joueurs en cours de sélection...", SwingConstants.CENTER);
+        subLabel.setFont(UITheme.FONT_BODY);
+        subLabel.setForeground(UITheme.ACCENT);
+        waitPanel.add(subLabel, gbc);
         this.add(waitPanel, BorderLayout.CENTER);
         this.revalidate();
         this.repaint();

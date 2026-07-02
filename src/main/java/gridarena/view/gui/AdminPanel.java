@@ -1,24 +1,24 @@
 package gridarena.view.gui;
 
 import gridarena.controller.AdminController;
+import gridarena.entity.hero.GroupHeroesToTableModelAdapter;
 import gridarena.model.BattlefieldModel;
 import gridarena.model.GameConfig;
-import gridarena.entity.hero.GroupHeroesToTableModelAdapter;
 import gridarena.view.BattlefieldView;
+import gridarena.view.UITheme;
 
 import javax.swing.*;
-import javax.swing.border.TitledBorder;
 import java.awt.*;
 
 /**
- * Vue principale pour le panneau d'administration de Grid Arena.
- * S'occupe uniquement du rendu graphique Swing et de la capture des valeurs.
+ * Vue principale du panneau d'administration de Grid Arena.
+ * Thème : "Tactical HQ" — charcoal chaud, accent crimson, angles droits.
  *
  * @author Florian Pépin.
- * @version 2.0
+ * @version 3.0
  */
 public class AdminPanel extends JFrame {
-    
+
     private final AdminController controller;
 
     private JSpinner spinGridSize;
@@ -40,140 +40,267 @@ public class AdminPanel extends JFrame {
     private JTable statsTable;
 
     public AdminPanel() {
-        super("Grid Arena : Panel Admin");
+        super("Grid Arena — Panel Admin");
         this.controller = new AdminController(this);
-        
+
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setSize(1000, 750);
+        this.setSize(1050, 760);
         this.setLocationRelativeTo(null);
         this.setLayout(new BorderLayout());
-        this.getRootPane().setBorder(BorderFactory.createMatteBorder(3, 3, 3, 3, new Color(245, 158, 11))); // Amber Border
+        this.getContentPane().setBackground(UITheme.BG_PRIMARY);
 
-        // Left Sidebar: Configuration Panel
-        JPanel sidebar = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setColor(new Color(30, 41, 59)); // Slate 800
-                g2.fillRect(0, 0, getWidth(), getHeight());
-                g2.dispose();
-            }
-        };
-        sidebar.setPreferredSize(new Dimension(320, 750));
-        sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
-        sidebar.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        // ── Barre de titre custom ──────────────────────────────────────────────
+        JPanel titleBar = new JPanel(new BorderLayout());
+        titleBar.setBackground(UITheme.ACCENT);
+        titleBar.setPreferredSize(new Dimension(0, 36));
+        JLabel titleLabel = new JLabel("  ▮  GRID ARENA  —  ADMIN PANEL");
+        titleLabel.setFont(UITheme.FONT_BADGE);
+        titleLabel.setForeground(UITheme.TEXT_PRIMARY);
+        titleBar.add(titleLabel, BorderLayout.WEST);
+        this.add(titleBar, BorderLayout.NORTH);
 
-        JLabel sideTitle = new JLabel("CONFIGURATION");
-        sideTitle.setFont(new Font("Segoe UI", Font.BOLD, 18));
-        sideTitle.setForeground(new Color(245, 158, 11)); // Amber
-        sideTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
-        sidebar.add(sideTitle);
-        sidebar.add(Box.createRigidArea(new Dimension(0, 15)));
-
-        // Config Grid panel
-        JPanel configGrid = new JPanel(new GridLayout(5, 2, 5, 10));
-        configGrid.setOpaque(false);
-        configGrid.setBorder(BorderFactory.createTitledBorder(
-                BorderFactory.createLineBorder(new Color(71, 85, 105), 1),
-                "Paramètres Carte",
-                TitledBorder.DEFAULT_JUSTIFICATION,
-                TitledBorder.DEFAULT_POSITION,
-                new Font("Segoe UI", Font.BOLD, 12),
-                new Color(241, 245, 249)
-        ));
-
-        spinGridSize = createSpinner(10, 5, 30);
-        spinWalls = createSpinner(5, 0, 50);
-        spinMedKits = createSpinner(3, 0, 50);
-        spinAmmoKits = createSpinner(3, 0, 50);
-        spinBarrels = createSpinner(3, 0, 50);
-
-        addConfigRow(configGrid, "Taille Grille :", spinGridSize);
-        addConfigRow(configGrid, "Murs :", spinWalls);
-        addConfigRow(configGrid, "Kits Soin :", spinMedKits);
-        addConfigRow(configGrid, "Kits Munitions :", spinAmmoKits);
-        addConfigRow(configGrid, "Barils :", spinBarrels);
-        sidebar.add(configGrid);
-        sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
-
-        // Config Players panel
-        JPanel configPlayers = new JPanel(new GridLayout(3, 2, 5, 10));
-        configPlayers.setOpaque(false);
-        configPlayers.setBorder(BorderFactory.createTitledBorder(
-                BorderFactory.createLineBorder(new Color(71, 85, 105), 1),
-                "Paramètres Joueurs",
-                TitledBorder.DEFAULT_JUSTIFICATION,
-                TitledBorder.DEFAULT_POSITION,
-                new Font("Segoe UI", Font.BOLD, 12),
-                new Color(241, 245, 249)
-        ));
-
-        spinGuiPlayers = createSpinner(2, 0, 10);
-        spinCliPlayers = createSpinner(0, 0, 10);
-        spinBotPlayers = createSpinner(1, 0, 10);
-
-        addConfigRow(configPlayers, "Joueurs GUI :", spinGuiPlayers);
-        addConfigRow(configPlayers, "Joueurs CLI :", spinCliPlayers);
-        addConfigRow(configPlayers, "Joueurs Bot :", spinBotPlayers);
-        sidebar.add(configPlayers);
-        sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
-
-        // Config Strategies panel
-        JPanel configStrats = new JPanel(new GridLayout(2, 2, 5, 10));
-        configStrats.setOpaque(false);
-        configStrats.setBorder(BorderFactory.createTitledBorder(
-                BorderFactory.createLineBorder(new Color(71, 85, 105), 1),
-                "Stratégies",
-                TitledBorder.DEFAULT_JUSTIFICATION,
-                TitledBorder.DEFAULT_POSITION,
-                new Font("Segoe UI", Font.BOLD, 12),
-                new Color(241, 245, 249)
-        ));
-
-        comboBotStrategy = new JComboBox<>(new String[]{"A* Pathfinding", "Dijkstra", "Greedy BFS"});
-        comboFillStrategy = new JComboBox<>(new String[]{"Pattern", "Random", "Modulo"});
-        styleComboBox(comboBotStrategy);
-        styleComboBox(comboFillStrategy);
-
-        addConfigRow(configStrats, "Strat. Bot :", comboBotStrategy);
-        addConfigRow(configStrats, "Placement :", comboFillStrategy);
-        sidebar.add(configStrats);
-        sidebar.add(Box.createRigidArea(new Dimension(0, 20)));
-
-        // Control Buttons
-        btnStart = createStyledButton("Démarrer la partie", new Color(16, 185, 129)); // Green
-        btnStart.setForeground(Color.BLACK);
-        btnStart.addActionListener(e -> controller.handleStart(getSelectedConfig()));
-        sidebar.add(btnStart);
-        sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
-
-        btnStop = createStyledButton("Arrêter la partie", new Color(244, 63, 94)); // Rose Red
-        btnStop.setForeground(Color.WHITE);
-        btnStop.setEnabled(false);
-        btnStop.addActionListener(e -> controller.handleStop());
-        sidebar.add(btnStop);
-
+        // ── Sidebar gauche ─────────────────────────────────────────────────────
+        JPanel sidebar = buildSidebar();
         this.add(sidebar, BorderLayout.WEST);
 
-        // Right Pane: Live View Panel
+        // ── Zone de jeu droite ────────────────────────────────────────────────
         rightPanel = new JPanel(new BorderLayout());
-        rightPanel.setBackground(new Color(15, 23, 42)); // Slate 900
+        rightPanel.setBackground(UITheme.BG_PRIMARY);
 
-        waitLabel = new JLabel("En attente du lancement de la partie...", SwingConstants.CENTER);
-        waitLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
-        waitLabel.setForeground(new Color(148, 163, 184)); // Slate 400
+        waitLabel = new JLabel("EN ATTENTE DU LANCEMENT", SwingConstants.CENTER);
+        waitLabel.setFont(UITheme.FONT_TITLE);
+        waitLabel.setForeground(UITheme.TEXT_MUTED);
         rightPanel.add(waitLabel, BorderLayout.CENTER);
 
         this.add(rightPanel, BorderLayout.CENTER);
         this.setVisible(true);
     }
 
-    /**
-     * Rassemble les valeurs saisies par l'utilisateur dans un conteneur GameConfig.
-     *
-     * @return l'objet GameConfig correspondant
-     */
+    // ── Construction de la sidebar ─────────────────────────────────────────────
+
+    private JPanel buildSidebar() {
+        JPanel sidebar = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                // Bordure droite séparatrice
+                g.setColor(UITheme.ACCENT);
+                g.fillRect(getWidth() - 3, 0, 3, getHeight());
+            }
+        };
+        sidebar.setPreferredSize(new Dimension(310, 0));
+        sidebar.setBackground(UITheme.BG_SECONDARY);
+        sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
+        sidebar.setBorder(BorderFactory.createEmptyBorder(18, 16, 18, 20));
+
+        // Section Carte
+        spinGridSize = createSpinner(10, 5, 30);
+        spinWalls    = createSpinner(5,  0, 50);
+        spinMedKits  = createSpinner(3,  0, 50);
+        spinAmmoKits = createSpinner(3,  0, 50);
+        spinBarrels  = createSpinner(3,  0, 50);
+
+        JPanel gridSection = createGridSection(2, new JComponent[][]{
+            {makeLabel("Taille grille"), spinGridSize},
+            {makeLabel("Murs"),          spinWalls},
+            {makeLabel("Kits soin"),     spinMedKits},
+            {makeLabel("Kits munitions"),spinAmmoKits},
+            {makeLabel("Barils"),        spinBarrels}
+        });
+        sidebar.add(makeBadge("PARAMÈTRES CARTE"));
+        sidebar.add(Box.createRigidArea(new Dimension(0, 8)));
+        sidebar.add(gridSection);
+        sidebar.add(Box.createRigidArea(new Dimension(0, 16)));
+
+        // Section Joueurs
+        spinGuiPlayers = createSpinner(2, 0, 10);
+        spinCliPlayers = createSpinner(0, 0, 10);
+        spinBotPlayers = createSpinner(1, 0, 10);
+
+        JPanel playersSection = createGridSection(2, new JComponent[][]{
+            {makeLabel("Joueurs GUI"),  spinGuiPlayers},
+            {makeLabel("Joueurs CLI"),  spinCliPlayers},
+            {makeLabel("Robots"),       spinBotPlayers}
+        });
+        sidebar.add(makeBadge("JOUEURS"));
+        sidebar.add(Box.createRigidArea(new Dimension(0, 8)));
+        sidebar.add(playersSection);
+        sidebar.add(Box.createRigidArea(new Dimension(0, 16)));
+
+        // Section Stratégies
+        comboBotStrategy  = createCombo("A* Pathfinding", "Dijkstra", "Greedy BFS");
+        comboFillStrategy = createCombo("Pattern", "Random", "Modulo");
+
+        JPanel stratSection = createGridSection(2, new JComponent[][]{
+            {makeLabel("Strat. bot"),   comboBotStrategy},
+            {makeLabel("Placement"),    comboFillStrategy}
+        });
+        sidebar.add(makeBadge("STRATÉGIES"));
+        sidebar.add(Box.createRigidArea(new Dimension(0, 8)));
+        sidebar.add(stratSection);
+        sidebar.add(Box.createRigidArea(new Dimension(0, 24)));
+
+        // Séparateur
+        JSeparator sep = new JSeparator();
+        sep.setForeground(UITheme.BORDER);
+        sep.setBackground(UITheme.BORDER);
+        sep.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
+        sidebar.add(sep);
+        sidebar.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        // Boutons
+        btnStart = createPrimaryButton("LANCER LA PARTIE");
+        btnStart.addActionListener(e -> controller.handleStart(getSelectedConfig()));
+        sidebar.add(btnStart);
+        sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        btnStop = createDangerButton("ARRÊTER LA PARTIE");
+        btnStop.setEnabled(false);
+        btnStop.addActionListener(e -> controller.handleStop());
+        sidebar.add(btnStop);
+
+        // Légende raccourcis clavier
+        sidebar.add(Box.createRigidArea(new Dimension(0, 20)));
+        sidebar.add(makeHint("1–6 : mode action  |  Flèches / ZQSD : action  |  P : passer"));
+
+        return sidebar;
+    }
+
+    // ── Widgets helpers ────────────────────────────────────────────────────────
+
+    private JLabel makeBadge(String text) {
+        JLabel badge = new JLabel("  " + text + "  ") {
+            @Override
+            protected void paintComponent(Graphics g) {
+                g.setColor(UITheme.ACCENT);
+                g.fillRect(0, 0, getWidth(), getHeight());
+                super.paintComponent(g);
+            }
+        };
+        badge.setFont(UITheme.FONT_BADGE);
+        badge.setForeground(UITheme.TEXT_PRIMARY);
+        badge.setOpaque(false);
+        badge.setAlignmentX(Component.LEFT_ALIGNMENT);
+        badge.setMaximumSize(new Dimension(Integer.MAX_VALUE, 22));
+        return badge;
+    }
+
+    private JLabel makeLabel(String text) {
+        JLabel l = new JLabel(text);
+        l.setFont(UITheme.FONT_LABEL);
+        l.setForeground(UITheme.TEXT_SECONDARY);
+        return l;
+    }
+
+    private JLabel makeHint(String text) {
+        JLabel hint = new JLabel(text);
+        hint.setFont(new Font("Segoe UI", Font.PLAIN, 10));
+        hint.setForeground(UITheme.TEXT_MUTED);
+        hint.setAlignmentX(Component.LEFT_ALIGNMENT);
+        return hint;
+    }
+
+    private JPanel createGridSection(int cols, JComponent[][] rows) {
+        JPanel panel = new JPanel(new GridLayout(rows.length, cols, 6, 8));
+        panel.setOpaque(false);
+        panel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, rows.length * 34));
+        for (JComponent[] row : rows) {
+            for (JComponent c : row) panel.add(c);
+        }
+        return panel;
+    }
+
+    private JSpinner createSpinner(int value, int min, int max) {
+        JSpinner spinner = new JSpinner(new SpinnerNumberModel(value, min, max, 1));
+        JFormattedTextField tf = ((JSpinner.DefaultEditor) spinner.getEditor()).getTextField();
+        tf.setBackground(UITheme.BG_TERTIARY);
+        tf.setForeground(UITheme.TEXT_PRIMARY);
+        tf.setCaretColor(UITheme.TEXT_PRIMARY);
+        tf.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 4));
+        spinner.setBackground(UITheme.BG_TERTIARY);
+        spinner.setBorder(BorderFactory.createLineBorder(UITheme.BORDER, 1));
+        return spinner;
+    }
+
+    private JComboBox<String> createCombo(String... items) {
+        JComboBox<String> combo = new JComboBox<>(items);
+        combo.setBackground(UITheme.BG_TERTIARY);
+        combo.setForeground(UITheme.TEXT_PRIMARY);
+        combo.setFont(UITheme.FONT_BODY);
+        combo.setBorder(BorderFactory.createLineBorder(UITheme.BORDER, 1));
+        return combo;
+    }
+
+    /** Bouton principal rouge plein, angles droits. */
+    private JButton createPrimaryButton(String text) {
+        JButton btn = new JButton(text) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                Color bg;
+                if      (!isEnabled())           bg = UITheme.BG_TERTIARY;
+                else if (getModel().isPressed())  bg = UITheme.ACCENT.darker();
+                else if (getModel().isRollover()) bg = UITheme.ACCENT_HOVER;
+                else                              bg = UITheme.ACCENT;
+                g2.setColor(bg);
+                g2.fillRect(0, 0, getWidth(), getHeight());
+                g2.setColor(isEnabled() ? UITheme.TEXT_PRIMARY : UITheme.TEXT_MUTED);
+                g2.setFont(getFont());
+                FontMetrics fm = g2.getFontMetrics();
+                g2.drawString(getText(), (getWidth() - fm.stringWidth(getText())) / 2,
+                        (getHeight() + fm.getAscent() - fm.getDescent()) / 2);
+                g2.dispose();
+            }
+        };
+        styleButton(btn);
+        return btn;
+    }
+
+    /** Bouton secondaire : fond sombre avec bordure crimson basse, texte rouge. */
+    private JButton createDangerButton(String text) {
+        JButton btn = new JButton(text) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                Color bg;
+                if      (!isEnabled())           bg = UITheme.BG_TERTIARY;
+                else if (getModel().isPressed())  bg = new Color(0x3A, 0x10, 0x10);
+                else if (getModel().isRollover()) bg = new Color(0x35, 0x18, 0x18);
+                else                              bg = UITheme.BG_TERTIARY;
+                g2.setColor(bg);
+                g2.fillRect(0, 0, getWidth(), getHeight());
+                // Bordure basse crimson
+                g2.setColor(isEnabled() ? UITheme.ACCENT : UITheme.TEXT_MUTED);
+                g2.fillRect(0, getHeight() - 2, getWidth(), 2);
+                g2.setFont(getFont());
+                FontMetrics fm = g2.getFontMetrics();
+                g2.drawString(getText(), (getWidth() - fm.stringWidth(getText())) / 2,
+                        (getHeight() + fm.getAscent() - fm.getDescent()) / 2);
+                g2.dispose();
+            }
+        };
+        styleButton(btn);
+        btn.setForeground(UITheme.ACCENT);
+        return btn;
+    }
+
+    private void styleButton(JButton btn) {
+        btn.setFocusPainted(false);
+        btn.setBorderPainted(false);
+        btn.setContentAreaFilled(false);
+        btn.setOpaque(false);
+        btn.setFont(UITheme.FONT_LABEL);
+        btn.setForeground(UITheme.TEXT_PRIMARY);
+        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 38));
+        btn.setPreferredSize(new Dimension(270, 38));
+        btn.setAlignmentX(Component.LEFT_ALIGNMENT);
+    }
+
+    // ── API publique (appelée par AdminController) ─────────────────────────────
+
     public GameConfig getSelectedConfig() {
         return new GameConfig(
                 (Integer) spinGridSize.getValue(),
@@ -189,15 +316,9 @@ public class AdminPanel extends JFrame {
         );
     }
 
-    /**
-     * Active/Désactive les composants de configuration en fonction de l'état de la partie.
-     *
-     * @param isRunning true si la partie tourne, false sinon
-     */
     public void setControlState(boolean isRunning) {
         btnStart.setEnabled(!isRunning);
         btnStop.setEnabled(isRunning);
-        
         spinGridSize.setEnabled(!isRunning);
         spinWalls.setEnabled(!isRunning);
         spinMedKits.setEnabled(!isRunning);
@@ -210,39 +331,43 @@ public class AdminPanel extends JFrame {
         comboFillStrategy.setEnabled(!isRunning);
     }
 
-    /**
-     * Construit et affiche la grille de jeu et le tableau des statistiques globales sur le panneau de droite.
-     *
-     * @param model le modèle de champ de bataille
-     */
     public void displayRunningGame(BattlefieldModel model) {
         rightPanel.removeAll();
-        
-        statsTable = new JTable(new GroupHeroesToTableModelAdapter(model.getHeroes()));
-        statsTable.setBackground(new Color(30, 41, 59));
-        statsTable.setForeground(new Color(241, 245, 249));
-        statsTable.setGridColor(new Color(51, 65, 85));
-        statsTable.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        statsTable.setRowHeight(25);
-        statsTable.getTableHeader().setBackground(new Color(15, 23, 42));
-        statsTable.getTableHeader().setForeground(new Color(245, 158, 11));
-        statsTable.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
 
-        JScrollPane scrollPane = new JScrollPane(statsTable);
-        scrollPane.setPreferredSize(new Dimension(100, 120));
-        scrollPane.getViewport().setBackground(new Color(30, 41, 59));
-        scrollPane.setBorder(BorderFactory.createLineBorder(new Color(51, 65, 85), 1));
-        
-        rightPanel.add(scrollPane, BorderLayout.NORTH);
+        // Header live
+        JPanel header = new JPanel(new BorderLayout());
+        header.setBackground(UITheme.BG_SECONDARY);
+        header.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, UITheme.ACCENT));
+        JLabel liveLabel = new JLabel("  ● LIVE");
+        liveLabel.setFont(UITheme.FONT_BADGE);
+        liveLabel.setForeground(UITheme.ACCENT);
+        header.add(liveLabel, BorderLayout.WEST);
+        rightPanel.add(header, BorderLayout.NORTH);
+
+        // Tableau stats
+        statsTable = new JTable(new GroupHeroesToTableModelAdapter(model.getHeroes()));
+        statsTable.setBackground(UITheme.BG_SECONDARY);
+        statsTable.setForeground(UITheme.TEXT_PRIMARY);
+        statsTable.setGridColor(UITheme.BORDER);
+        statsTable.setFont(UITheme.FONT_BODY);
+        statsTable.setRowHeight(24);
+        statsTable.setShowHorizontalLines(true);
+        statsTable.setShowVerticalLines(false);
+        statsTable.getTableHeader().setBackground(UITheme.ACCENT);
+        statsTable.getTableHeader().setForeground(UITheme.TEXT_PRIMARY);
+        statsTable.getTableHeader().setFont(UITheme.FONT_LABEL);
+
+        JScrollPane scroll = new JScrollPane(statsTable);
+        scroll.setPreferredSize(new Dimension(0, 110));
+        scroll.getViewport().setBackground(UITheme.BG_SECONDARY);
+        scroll.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, UITheme.BORDER));
+
+        rightPanel.add(scroll, BorderLayout.SOUTH);
         rightPanel.add(new BattlefieldView(model), BorderLayout.CENTER);
-        
         rightPanel.revalidate();
         rightPanel.repaint();
     }
 
-    /**
-     * Remet le panneau de droite en mode attente.
-     */
     public void displayWaitingScreen() {
         rightPanel.removeAll();
         rightPanel.add(waitLabel, BorderLayout.CENTER);
@@ -250,9 +375,6 @@ public class AdminPanel extends JFrame {
         rightPanel.repaint();
     }
 
-    /**
-     * Force le rafraîchissement visuel du tableau.
-     */
     public void refreshStatsTable() {
         if (statsTable != null) {
             statsTable.revalidate();
@@ -260,86 +382,7 @@ public class AdminPanel extends JFrame {
         }
     }
 
-    /**
-     * Affiche une boîte de dialogue d'erreur.
-     *
-     * @param title le titre de l'erreur
-     * @param message le corps du message
-     */
     public void showError(String title, String message) {
         JOptionPane.showMessageDialog(this, message, title, JOptionPane.ERROR_MESSAGE);
-    }
-
-    private JSpinner createSpinner(int value, int min, int max) {
-        SpinnerNumberModel model = new SpinnerNumberModel(value, min, max, 1);
-        JSpinner spinner = new JSpinner(model);
-        JComponent editor = spinner.getEditor();
-        JFormattedTextField txt = ((JSpinner.DefaultEditor) editor).getTextField();
-        txt.setBackground(new Color(15, 23, 42));
-        txt.setForeground(Color.WHITE);
-        txt.setCaretColor(Color.WHITE);
-        spinner.setBorder(BorderFactory.createLineBorder(new Color(71, 85, 105), 1));
-        return spinner;
-    }
-
-    private void styleComboBox(JComboBox<String> combo) {
-        combo.setBackground(new Color(15, 23, 42));
-        combo.setForeground(Color.WHITE);
-        combo.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        combo.setBorder(BorderFactory.createLineBorder(new Color(71, 85, 105), 1));
-    }
-
-    private void addConfigRow(JPanel panel, String labelText, JComponent comp) {
-        JLabel label = new JLabel(labelText);
-        label.setFont(new Font("Segoe UI", Font.BOLD, 11));
-        label.setForeground(new Color(203, 213, 225));
-        panel.add(label);
-        panel.add(comp);
-    }
-
-    private JButton createStyledButton(String text, Color baseBg) {
-        JButton button = new JButton(text) {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                Color bg;
-                if (!isEnabled()) {
-                    bg = new Color(51, 65, 85);
-                } else if (getModel().isPressed()) {
-                    bg = getBackground().darker();
-                } else if (getModel().isRollover()) {
-                    bg = getBackground().brighter();
-                } else {
-                    bg = getBackground();
-                }
-                g2.setColor(bg);
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
-                
-                if (!isEnabled()) {
-                    g2.setColor(new Color(100, 116, 139));
-                } else {
-                    g2.setColor(getForeground());
-                }
-                g2.setFont(getFont());
-                FontMetrics fm = g2.getFontMetrics();
-                Rectangle stringBounds = fm.getStringBounds(getText(), g2).getBounds();
-                int textX = (getWidth() - stringBounds.width) / 2;
-                int textY = (getHeight() - stringBounds.height) / 2 + fm.getAscent();
-                g2.drawString(getText(), textX, textY);
-                g2.dispose();
-            }
-        };
-        button.setFocusPainted(false);
-        button.setBorderPainted(false);
-        button.setContentAreaFilled(false);
-        button.setOpaque(false);
-        button.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        button.setForeground(Color.WHITE);
-        button.setBackground(baseBg);
-        button.setMaximumSize(new Dimension(280, 40));
-        button.setPreferredSize(new Dimension(280, 40));
-        button.setAlignmentX(Component.CENTER_ALIGNMENT);
-        return button;
     }
 }

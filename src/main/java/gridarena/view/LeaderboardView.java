@@ -2,6 +2,7 @@ package gridarena.view;
 
 import gridarena.entity.hero.*;
 import gridarena.model.*;
+import gridarena.view.UITheme;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,45 +21,47 @@ public class LeaderboardView extends JPanel {
         super(new BorderLayout(15, 15));
         this.battlefield = battlefield;
         this.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        this.setBackground(new Color(15, 23, 42)); // Slate 900
+        this.setBackground(UITheme.BG_PRIMARY);
         
         Hero hero = this.battlefield.getCurrentHero();
         GroupHeroesArrayList group = new GroupHeroesArrayList();
         group.addHero(hero);
         
-        JLabel l1 = new JLabel("VOS STATISTIQUES PERSONNELLES");
-        l1.setFont(new Font("Segoe UI", Font.BOLD, 18));
-        l1.setForeground(new Color(245, 158, 11)); // Amber 500
+        JLabel l1 = new JLabel("STATISTIQUES DE PARTIE", SwingConstants.CENTER);
+        l1.setFont(UITheme.FONT_LABEL);
+        l1.setForeground(UITheme.TEXT_SECONDARY);
         l1.setHorizontalAlignment(SwingConstants.CENTER);
         
-        JLabel l2 = new JLabel(hero.isAlive() ? "VOUS AVEZ GAGNÉ !" : "VOUS AVEZ PERDU !");
-        l2.setFont(new Font("Segoe UI", Font.BOLD, 22));
-        if (hero.isAlive()) {
-            l2.setForeground(new Color(16, 185, 129)); // Emerald Green
-        } else {
-            l2.setForeground(new Color(244, 63, 94)); // Rose Red
-        }
+        String resultText = hero.isAlive() ? "VICTOIRE" : "DÉFAITE";
+        JLabel l2 = new JLabel(resultText, SwingConstants.CENTER);
+        l2.setFont(UITheme.FONT_TITLE);
+        l2.setForeground(hero.isAlive() ? UITheme.SUCCESS : UITheme.ACCENT);
         l2.setHorizontalAlignment(SwingConstants.CENTER);
         
-        // Configuration de la JTable
         JTable table = new JTable(new GroupHeroesToTableModelAdapter(group));
-        table.setBackground(new Color(30, 41, 59)); // Slate 800
-        table.setForeground(new Color(241, 245, 249)); // Slate 100
-        table.setGridColor(new Color(51, 65, 85)); // Slate 700
-        table.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        table.setRowHeight(30);
-        
-        table.getTableHeader().setBackground(new Color(15, 23, 42)); // Slate 900
-        table.getTableHeader().setForeground(new Color(245, 158, 11)); // Amber 500
-        table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
+        table.setBackground(UITheme.BG_SECONDARY);
+        table.setForeground(UITheme.TEXT_PRIMARY);
+        table.setGridColor(UITheme.BORDER);
+        table.setFont(UITheme.FONT_BODY);
+        table.setRowHeight(28);
+        table.setShowHorizontalLines(true);
+        table.setShowVerticalLines(false);
+        table.getTableHeader().setBackground(UITheme.ACCENT);
+        table.getTableHeader().setForeground(UITheme.TEXT_PRIMARY);
+        table.getTableHeader().setFont(UITheme.FONT_LABEL);
         
         JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.getViewport().setBackground(new Color(30, 41, 59)); // Slate 800
-        scrollPane.setBorder(BorderFactory.createLineBorder(new Color(51, 65, 85), 1));
+        scrollPane.getViewport().setBackground(UITheme.BG_SECONDARY);
+        scrollPane.setBorder(BorderFactory.createLineBorder(UITheme.BORDER, 1));
         
-        this.add(l1, BorderLayout.NORTH);
+        // Panneau header avec badge
+        JPanel headerPanel = new JPanel(new BorderLayout(0, 6));
+        headerPanel.setOpaque(false);
+        headerPanel.add(l2, BorderLayout.CENTER);
+        headerPanel.add(l1, BorderLayout.SOUTH);
+        
+        this.add(headerPanel, BorderLayout.NORTH);
         this.add(scrollPane, BorderLayout.CENTER);
-        this.add(l2, BorderLayout.SOUTH);
         this.setVisible(true);
     }
     

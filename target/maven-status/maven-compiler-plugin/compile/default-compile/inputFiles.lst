@@ -26,6 +26,7 @@
 /home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/controller/command/AddExplosiveCommand.java
 /home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/controller/command/Command.java
 /home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/entity/hero/WarriorFactory.java
+/home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/view/UITheme.java
 /home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/entity/explosive/Bomb.java
 /home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/controller/state/BombState.java
 /home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/controller/command/ShootCommand.java

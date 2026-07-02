@@ -7,6 +7,7 @@ import gridarena.entity.explosive.*;
 import gridarena.entity.hero.*;
 import gridarena.model.*;
 import gridarena.utils.ModelListener;
+import gridarena.view.UITheme;
 
 import javax.swing.*;
 import java.awt.*;
@@ -48,7 +49,7 @@ public class BattlefieldView extends JPanel implements ModelListener {
                     int y = i * cellHeight;
                     g.drawImage(background, x, y, cellWidth, cellHeight, null);
                     
-                    g.setColor(new Color(15, 23, 42, 60)); // Transparent Slate 900
+                    g.setColor(new Color(0x3A, 0x3A, 0x3C, 80)); // BORDER semi-transparent
                     g.drawRect(x, y, cellWidth, cellHeight);
                     
                     if (map[i][j] != null) {
@@ -71,9 +72,29 @@ public class BattlefieldView extends JPanel implements ModelListener {
             if (currentHero != null) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(new Color(16, 185, 129)); // Emerald Green
+                // Bordure crimson nette (pas de coin arrondi)
+                g2.setColor(UITheme.ACCENT);
+                g2.setStroke(new BasicStroke(3f));
+                g2.drawRect(
+                    currentHero.getY() * cellWidth + 2,
+                    currentHero.getX() * cellHeight + 2,
+                    cellWidth - 4, cellHeight - 4
+                );
+                // Coin haut-gauche accent
+                g2.setColor(UITheme.ACCENT_HOVER);
                 g2.setStroke(new BasicStroke(4f));
-                g2.drawRoundRect(currentHero.getY() * cellWidth + 2, currentHero.getX() * cellHeight + 2, cellWidth - 4, cellHeight - 4, 8, 8);
+                g2.drawLine(
+                    currentHero.getY() * cellWidth + 2,
+                    currentHero.getX() * cellHeight + 2,
+                    currentHero.getY() * cellWidth + 10,
+                    currentHero.getX() * cellHeight + 2
+                );
+                g2.drawLine(
+                    currentHero.getY() * cellWidth + 2,
+                    currentHero.getX() * cellHeight + 2,
+                    currentHero.getY() * cellWidth + 2,
+                    currentHero.getX() * cellHeight + 10
+                );
                 g2.dispose();
             }
         }
@@ -82,7 +103,7 @@ public class BattlefieldView extends JPanel implements ModelListener {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        this.setBackground(new Color(15, 23, 42)); // Slate 900
+        this.setBackground(UITheme.BG_PRIMARY);
         this.displayMap(g, this.battlefield.getGrid(), this.battlefield.getCurrentHero());
     }
     

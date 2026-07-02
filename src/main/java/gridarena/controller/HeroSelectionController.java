@@ -4,6 +4,7 @@ import gridarena.model.BattlefieldModel;
 import gridarena.view.gui.PlayerGUI;
 import gridarena.entity.hero.HeroFactory;
 import gridarena.entity.hero.CustomHeroFactory;
+import gridarena.view.UITheme;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -42,43 +43,45 @@ public class HeroSelectionController extends JPanel {
         this.game = game;
         this.playerGUI = playerGUI;
         this.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        this.setBackground(new Color(15, 23, 42)); // Slate 900
+        this.setBackground(UITheme.BG_PRIMARY);
 
         JLabel titleLabel = new JLabel("CRÉATION DE VOTRE HÉROS", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 22));
-        titleLabel.setForeground(new Color(241, 245, 249)); // Slate 100
+        titleLabel.setFont(UITheme.FONT_TITLE);
+        titleLabel.setForeground(UITheme.TEXT_PRIMARY);
         this.add(titleLabel, BorderLayout.NORTH);
 
         JPanel mainPanel = new JPanel(new GridLayout(1, 2, 25, 0));
         mainPanel.setOpaque(false);
 
         // 1. Panel Classes Préfaites
-        JPanel premadePanel = new JPanel(new GridLayout(3, 1, 15, 15)) {
+        JPanel premadePanel = new JPanel(new GridLayout(3, 1, 12, 12)) {
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(new Color(30, 41, 59)); // Slate 800
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 16, 16);
+                g2.setColor(UITheme.BG_SECONDARY);
+                g2.fillRect(0, 0, getWidth(), getHeight());
+                // Bordure gauche crimson
+                g2.setColor(UITheme.ACCENT);
+                g2.fillRect(0, 0, 3, getHeight());
                 g2.dispose();
             }
         };
         premadePanel.setOpaque(false);
         premadePanel.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createEmptyBorder(5, 5, 5, 5),
+            BorderFactory.createEmptyBorder(5, 10, 5, 5),
             BorderFactory.createTitledBorder(
                 BorderFactory.createEmptyBorder(),
-                "Classes Préfaites",
+                "CLASSES PRÉFAITES",
                 TitledBorder.DEFAULT_JUSTIFICATION,
                 TitledBorder.DEFAULT_POSITION,
-                new Font("Segoe UI", Font.BOLD, 14),
-                new Color(245, 158, 11) // Amber 500
+                UITheme.FONT_BADGE,
+                UITheme.TEXT_SECONDARY
             )
         ));
         
-        JButton buttonWarrior = createStyledButton("Warrior", new Color(71, 85, 105));
-        JButton buttonAssassin = createStyledButton("Assassin", new Color(71, 85, 105));
-        JButton buttonMastodonte = createStyledButton("Mastodonte", new Color(71, 85, 105));
+        JButton buttonWarrior    = createHeroCardButton("Warrior");
+        JButton buttonAssassin   = createHeroCardButton("Assassin");
+        JButton buttonMastodonte = createHeroCardButton("Mastodonte");
         
         buttonWarrior.addActionListener(e -> {
             this.battlefield.addHero(HeroFactory.getFactory("warrior"));
@@ -103,22 +106,24 @@ public class HeroSelectionController extends JPanel {
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(new Color(30, 41, 59)); // Slate 800
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 16, 16);
+                g2.setColor(UITheme.BG_SECONDARY);
+                g2.fillRect(0, 0, getWidth(), getHeight());
+                // Bordure gauche crimson
+                g2.setColor(UITheme.ACCENT);
+                g2.fillRect(0, 0, 3, getHeight());
                 g2.dispose();
             }
         };
         customPanel.setOpaque(false);
         customPanel.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createEmptyBorder(5, 5, 5, 5),
+            BorderFactory.createEmptyBorder(5, 10, 5, 5),
             BorderFactory.createTitledBorder(
                 BorderFactory.createEmptyBorder(),
-                "Héros Personnalisé",
+                "HÉROS PERSONNALISÉ",
                 TitledBorder.DEFAULT_JUSTIFICATION,
                 TitledBorder.DEFAULT_POSITION,
-                new Font("Segoe UI", Font.BOLD, 14),
-                new Color(245, 158, 11) // Amber 500
+                UITheme.FONT_BADGE,
+                UITheme.TEXT_SECONDARY
             )
         ));
 
@@ -126,8 +131,8 @@ public class HeroSelectionController extends JPanel {
         statsPanel.setOpaque(false);
         
         labelPointsLeft = new JLabel("Points restants : " + pointsLeft, SwingConstants.CENTER);
-        labelPointsLeft.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        labelPointsLeft.setForeground(new Color(245, 158, 11));
+        labelPointsLeft.setFont(UITheme.FONT_SUBTITLE);
+        labelPointsLeft.setForeground(UITheme.ACCENT);
         customPanel.add(labelPointsLeft, BorderLayout.NORTH);
 
         // HP row
@@ -197,9 +202,9 @@ public class HeroSelectionController extends JPanel {
 
         customPanel.add(statsPanel, BorderLayout.CENTER);
 
-        JButton btnCreateCustom = createStyledButton("Créer mon Héros", new Color(245, 158, 11));
-        btnCreateCustom.setForeground(Color.BLACK);
-        btnCreateCustom.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        JButton btnCreateCustom = createStyledButton("CRÉER MON HÉROS", UITheme.ACCENT);
+        btnCreateCustom.setForeground(UITheme.TEXT_PRIMARY);
+        btnCreateCustom.setFont(UITheme.FONT_SUBTITLE);
         btnCreateCustom.addActionListener(e -> {
             int hp = 50 + ptsHp * 10;
             int ammo = 2 + ptsAmmo * 2;
@@ -218,35 +223,27 @@ public class HeroSelectionController extends JPanel {
         this.setVisible(true);
     }
 
-    private JButton createStyledButton(String text, Color baseBg) {
+    /** Carte classe hero : fond BG_TERTIARY, bordure gauche crimson au survol. */
+    private JButton createHeroCardButton(String text) {
         JButton button = new JButton(text) {
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 Color bg;
-                if (!isEnabled()) {
-                    bg = new Color(51, 65, 85); // Slate 700
-                } else if (getModel().isPressed()) {
-                    bg = getBackground().darker();
-                } else if (getModel().isRollover()) {
-                    bg = getBackground().brighter();
-                } else {
-                    bg = getBackground();
-                }
+                if      (!isEnabled())           bg = new Color(0x22, 0x22, 0x24);
+                else if (getModel().isPressed())  bg = UITheme.ACCENT.darker();
+                else if (getModel().isRollover()) bg = UITheme.BG_SECONDARY;
+                else                              bg = UITheme.BG_TERTIARY;
                 g2.setColor(bg);
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
-                
-                if (!isEnabled()) {
-                    g2.setColor(new Color(100, 116, 139)); // Slate 500
-                } else {
-                    g2.setColor(getForeground());
-                }
+                g2.fillRect(0, 0, getWidth(), getHeight());
+                // Barre gauche crimson
+                g2.setColor(UITheme.ACCENT);
+                g2.fillRect(0, 0, 4, getHeight());
+                g2.setColor(isEnabled() ? UITheme.TEXT_PRIMARY : UITheme.TEXT_MUTED);
                 g2.setFont(getFont());
                 FontMetrics fm = g2.getFontMetrics();
-                Rectangle stringBounds = fm.getStringBounds(getText(), g2).getBounds();
-                int textX = (getWidth() - stringBounds.width) / 2;
-                int textY = (getHeight() - stringBounds.height) / 2 + fm.getAscent();
+                int textX = (getWidth()  - fm.stringWidth(getText())) / 2;
+                int textY = (getHeight() + fm.getAscent() - fm.getDescent()) / 2;
                 g2.drawString(getText(), textX, textY);
                 g2.dispose();
             }
@@ -255,24 +252,54 @@ public class HeroSelectionController extends JPanel {
         button.setBorderPainted(false);
         button.setContentAreaFilled(false);
         button.setOpaque(false);
-        button.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        button.setForeground(new Color(241, 245, 249)); // Slate 100
+        button.setFont(UITheme.FONT_SUBTITLE);
+        button.setForeground(UITheme.TEXT_PRIMARY);
+        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        return button;
+    }
+
+    private JButton createStyledButton(String text, Color baseBg) {
+        JButton button = new JButton(text) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                Color bg;
+                if      (!isEnabled())           bg = new Color(0x22, 0x22, 0x24);
+                else if (getModel().isPressed())  bg = getBackground().darker();
+                else if (getModel().isRollover()) bg = getBackground().brighter();
+                else                              bg = getBackground();
+                g2.setColor(bg);
+                g2.fillRect(0, 0, getWidth(), getHeight());
+                g2.setColor(isEnabled() ? getForeground() : UITheme.TEXT_MUTED);
+                g2.setFont(getFont());
+                FontMetrics fm = g2.getFontMetrics();
+                int textX = (getWidth()  - fm.stringWidth(getText())) / 2;
+                int textY = (getHeight() + fm.getAscent() - fm.getDescent()) / 2;
+                g2.drawString(getText(), textX, textY);
+                g2.dispose();
+            }
+        };
+        button.setFocusPainted(false);
+        button.setBorderPainted(false);
+        button.setContentAreaFilled(false);
+        button.setOpaque(false);
+        button.setFont(UITheme.FONT_SUBTITLE);
+        button.setForeground(UITheme.TEXT_PRIMARY);
         button.setBackground(baseBg);
         return button;
     }
 
     private JButton createSmallButton(String text) {
-        JButton button = createStyledButton(text, new Color(71, 85, 105));
-        button.setPreferredSize(new Dimension(35, 30));
-        button.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        JButton button = createStyledButton(text, UITheme.BG_TERTIARY);
+        button.setPreferredSize(new Dimension(30, 26));
+        button.setFont(UITheme.FONT_SUBTITLE);
         return button;
     }
 
     private JLabel createLabel() {
         JLabel label = new JLabel();
-        label.setPreferredSize(new Dimension(200, 20));
-        label.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        label.setForeground(new Color(241, 245, 249)); // Slate 100
+        label.setFont(UITheme.FONT_BODY);
+        label.setForeground(UITheme.TEXT_SECONDARY);
         return label;
     }
 
