@@ -1,3 +1,6 @@
+.vscode
+.metals
 .idea
 classes/
 gridarena.iml
+target/
