@@ -9,6 +9,7 @@ import gridarena.view.gui.*;
 import gridarena.view.cli.*;
 
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * Représente le contrôleur mère du jeu.
@@ -24,6 +25,10 @@ public class GameController implements Runnable {
     private int guiPlayers, cliPlayers, botPlayers;
     private int playersCounter;
     public int currentPlayer;
+    private boolean gameStarted = false;
+    private volatile boolean running = true;
+    private Thread gameThread;
+    private CountDownLatch heroSelectionLatch;
     
     public GameController(boolean showOverview, int guiPlayers, int cliPlayers, int botPlayers, int sizeGrid, int walls, int medicalKits, int ammoKits, int barrels, FillStrategy fillStrategy) {
         this.battlefield = new Battlefield(sizeGrid, walls, medicalKits, ammoKits, barrels, fillStrategy);
@@ -34,9 +39,44 @@ public class GameController implements Runnable {
         this.botPlayers = botPlayers;
         this.playersCounter = 0;
         this.currentPlayer = 0;
-        if (showOverview) {
-            GameGUI.createGameGUI(this.battlefield);
+    }
+    
+    public boolean isGameStarted() {
+        return this.gameStarted;
+    }
+
+    public boolean allPlayersHaveSelectedHero() {
+        for (Player p : this.players) {
+            if (!p.hasHero()) {
+                return false;
+            }
         }
+        return true;
+    }
+
+    public void stop() {
+        this.running = false;
+        this.gameStarted = false;
+        for (Player p : this.playersHistory) {
+            if (p instanceof PlayerGUI) {
+                ((PlayerGUI) p).disposeFrame();
+            }
+        }
+        // Interrompt le thread de jeu :
+        //  - débloque CountDownLatch.await() (Phase 1)
+        //  - débloque SynchronousQueue.take()  (Phase 2 via PlayerGUI.takeMyTurn)
+        //  - débloque Thread.sleep()           (PlayerBot)
+        if (this.gameThread != null) {
+            this.gameThread.interrupt();
+        }
+    }
+
+    public boolean isRunning() {
+        return this.running;
+    }
+
+    public Battlefield getBattlefield() {
+        return this.battlefield;
     }
     
     /**
@@ -45,16 +85,20 @@ public class GameController implements Runnable {
      * @param botStrategy strategie du bot.
      */
     public void demarrer(BotStrategy botStrategy) {
+        this.running = true;
+        // Un CountDownLatch par GUI player : atteint 0 quand tous ont choisi leur héros
+        this.heroSelectionLatch = new CountDownLatch(this.guiPlayers);
         for (int i = 0; i < this.guiPlayers+this.cliPlayers+this.botPlayers; i++) {
             if (i < this.guiPlayers) {
-                this.addPlayer(new PlayerGUI(this, new BattlefieldProxy(this.battlefield), "J"+(i+1)));   
+                this.addPlayer(new PlayerGUI(this, new BattlefieldProxy(this.battlefield), "J"+(i+1), this.heroSelectionLatch));
             } else if (i < this.guiPlayers+this.cliPlayers) {
                 this.addPlayer(new PlayerCLI(this, new BattlefieldProxy(this.battlefield), "J"+(i+1)));
             } else {
                 this.addPlayer(new PlayerBot(this, new BattlefieldProxy(this.battlefield), "Bot"+(i+1), botStrategy));
             }
         }
-        new Thread(this).start();
+        this.gameThread = new Thread(this);
+        this.gameThread.start();
     }
     
     /**
@@ -116,22 +160,58 @@ public class GameController implements Runnable {
         throw new RuntimeException("Le joueur "+player.getName()+" n'a pas été trouvé.");
     }
     
-    /**
-     * Lancer le tour par tour.
-     */
-    public synchronized void run() {
-        while (this.playersCounter > 1) {
+    public void run() {
+        // Phase 1 : Sélection des héros
+        
+        // Auto-sélection pour les robots
+        for (Player p : this.players) {
+            if (!this.running) return;
+            if (p instanceof PlayerBot) {
+                p.takeMyTurn();
+            }
+        }
+        
+        // Sélection séquentielle pour les joueurs console (partage de System.in)
+        for (Player p : this.players) {
+            if (!this.running) return;
+            if (p instanceof PlayerCLI) {
+                p.takeMyTurn();
+            }
+        }
+        
+        // Attente des joueurs graphiques qui choisissent en parallèle (CountDownLatch)
+        try {
+            this.heroSelectionLatch.await();
+        } catch (InterruptedException e) {
+            return; // Partie arrêtée pendant la sélection
+        }
+
+        if (!this.running) return;
+        
+        // Tous les héros sont sélectionnés, on démarre la partie !
+        this.gameStarted = true;
+        
+        // Affichage du plateau de jeu principal pour tous les joueurs graphiques
+        for (Player p : this.players) {
+            if (p instanceof PlayerGUI) {
+                ((PlayerGUI) p).showGameplay();
+            }
+        }
+        
+        // Phase 2 : Déroulement du jeu au tour par tour
+        while (this.playersCounter > 1 && this.running) {
             this.battlefield.setCurrentHero(this.findPlayer(this.players.get(this.currentPlayer)));
             this.players.get(this.currentPlayer).takeMyTurn();
+            if (!this.running) break;
             this.nextTurn(this.currentPlayer);
             this.currentPlayer++;
             if (this.currentPlayer >= this.players.size()) {
                 this.currentPlayer = 0;
             }
         }
-        for (Player player : this.playersHistory) {
-            if (player instanceof PlayerWithLeaderboard) {
-                ((PlayerWithLeaderboard) player).showLeaderboard();   
+        if (this.running) {
+            for (Player player : this.playersHistory) {
+                player.showLeaderboard();
             }
         }
     }

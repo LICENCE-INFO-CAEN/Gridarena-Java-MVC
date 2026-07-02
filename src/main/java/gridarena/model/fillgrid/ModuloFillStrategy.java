@@ -48,14 +48,14 @@ public class ModuloFillStrategy implements FillStrategy {
     }
     
     @Override
-    public Hero fillGridWithHero(Entity[][] grid, String specialization) {
+    public Hero fillGridWithHero(Entity[][] grid, HeroFactory factory) {
         Random random = new Random();
         int size = grid.length;
         int x = random.nextInt(grid.length);
         int y = random.nextInt(grid[0].length);
         while(true) {
             if (grid[x][y] == null && (x!=0 && y!=0) && (x!=0 && y!=size-1) && (x!=size-1 && y!=0) && (x!=size-1 && y!=size-1)) {
-                Hero hero = HeroFactory.getFactory(specialization).createHero(x, y);
+                Hero hero = factory.createHero(x, y);
                 grid[x][y] = hero;
                 return hero;
             } else {

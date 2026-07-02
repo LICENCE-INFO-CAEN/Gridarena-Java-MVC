@@ -1,9 +1,6 @@
 package gridarena.entity.hero;
 
 import gridarena.entity.Entity;
-import gridarena.entity.explosive.Bomb;
-import gridarena.entity.explosive.Explosive;
-import gridarena.entity.explosive.Mine;
 
 /**
  * Représente le Hero que le joueur incarne.
@@ -247,29 +244,31 @@ public abstract class Hero extends Entity {
     }
     
     /**
-     * Création d'un explosif.
+     * Utiliser une mine en décrémentant le stock si disponible.
      * 
-     * @param x position (ligne) du joueur sur la grille.
-     * @param y position (colonne) du joueur sur la grille.
-     * @param explosif a déployer.
-     * @return une mine ou une bombe si le joueur en a en stock sinon null.
+     * @return true si une mine a été consommée, false sinon.
      */
-    public Explosive deployExplosive(int x, int y, String explosif) {
-        switch(explosif) {
-            case "mine":
-                if (this.getMineRemaining() > 0) {
-                    this.setMineRemaining(this.mineRemaining-1);
-                    return new Mine(x, y, this);
-                }
-                break;
-            case "bomb":
-                if (this.getBombRemaining() > 0) {
-                    this.setBombRemaining(this.bombRemaining-1);
-                    return new Bomb(x, y, this);
-                }
-                break;
+    public boolean useMine() {
+        if (this.mineRemaining > 0) {
+            this.mineRemaining--;
+            this.fireChange();
+            return true;
         }
-        return null;
+        return false;
+    }
+
+    /**
+     * Utiliser une bombe en décrémentant le stock si disponible.
+     * 
+     * @return true si une bombe a été consommée, false sinon.
+     */
+    public boolean useBomb() {
+        if (this.bombRemaining > 0) {
+            this.bombRemaining--;
+            this.fireChange();
+            return true;
+        }
+        return false;
     }
     
     /**

@@ -36,7 +36,6 @@ public class BattlefieldView extends JPanel implements ModelListener {
      * @param currentHero héro à montrer en surbrillance.
      */
     public void displayMap(Graphics g, Entity[][] map, Hero currentHero) {
-        g.setColor(Color.BLACK);
         if (map != null) {
             int cellWidth = getWidth() / map[0].length;
             int cellHeight = getHeight() / map.length;
@@ -48,10 +47,11 @@ public class BattlefieldView extends JPanel implements ModelListener {
                     int x = j * cellWidth;
                     int y = i * cellHeight;
                     g.drawImage(background, x, y, cellWidth, cellHeight, null);
+                    
+                    g.setColor(new Color(15, 23, 42, 60)); // Transparent Slate 900
                     g.drawRect(x, y, cellWidth, cellHeight);
-                    if (map[i][j] == null) {
-                        g.drawString("", x + cellWidth / 2, y + cellHeight / 2);
-                    } else {
+                    
+                    if (map[i][j] != null) {
                         String imageUrl = map[i][j].getImageUrl();
                         Image img = new ImageIcon(getClass().getResource(imageUrl)).getImage();
                         if (map[i][j] instanceof Barrel) {
@@ -63,17 +63,18 @@ public class BattlefieldView extends JPanel implements ModelListener {
                         } else if (map[i][j] instanceof Consumable) {
                             g.drawImage(img, x + cellWidth / 5, y + cellHeight / 5, 50, 50, null);
                         } else if(map[i][j] instanceof Hero) {
-                            Hero hero = (Hero) map[i][j];
                             g.drawImage(img, x+20, y+9, 13 * 2, 26 * 2, null);
                         }
                     }
-
                 }
             }
             if (currentHero != null) {
-                  g.setColor(Color.GREEN);
-                  g.drawRect(currentHero.getY()*cellWidth, currentHero.getX()*cellHeight, cellWidth, cellHeight);
-                  g.setColor(Color.BLACK);
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(new Color(16, 185, 129)); // Emerald Green
+                g2.setStroke(new BasicStroke(4f));
+                g2.drawRoundRect(currentHero.getY() * cellWidth + 2, currentHero.getX() * cellHeight + 2, cellWidth - 4, cellHeight - 4, 8, 8);
+                g2.dispose();
             }
         }
     }
@@ -81,12 +82,8 @@ public class BattlefieldView extends JPanel implements ModelListener {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        this.setBackground(Color.WHITE);
-        if (this.battlefield instanceof Battlefield) {
-            this.displayMap(g, this.battlefield.getGrid(), this.battlefield.getCurrentHero());
-        } else {
-            this.displayMap(g, this.battlefield.getGrid(), ((BattlefieldProxy)this.battlefield).getHero());   
-        }
+        this.setBackground(new Color(15, 23, 42)); // Slate 900
+        this.displayMap(g, this.battlefield.getGrid(), this.battlefield.getCurrentHero());
     }
     
     @Override

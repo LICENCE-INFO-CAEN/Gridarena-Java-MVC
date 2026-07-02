@@ -26,12 +26,12 @@ public class BattlefieldProxy extends AbstractListenableModel implements Battlef
 
     @Override
     public Hero getCurrentHero() {
-        throw new RuntimeException("méthode indélicate bloquée par le proxy");
+        return this.hero;
     }
 
     @Override
     public void setCurrentHero(int i) {
-        throw new RuntimeException("méthode indélicate bloquée par le proxy");
+        this.battlefield.setCurrentHero(i);
     }
     
     public Entity[][] filteredGrid(Hero hero, Entity[][] grid) {
@@ -57,16 +57,12 @@ public class BattlefieldProxy extends AbstractListenableModel implements Battlef
     
     @Override
     public GroupHeroesArrayList getHeroes() {
-        throw new RuntimeException("méthode indélicate bloquée par le proxy");
-    }
-    
-    public Hero getHero() {
-        return this.hero;
+        return this.battlefield.getHeroes();
     }
     
     @Override
-    public Hero addHero(String specialization) {
-        this.hero = this.battlefield.addHero(specialization);
+    public Hero addHero(HeroFactory factory) {
+        this.hero = this.battlefield.addHero(factory);
         return this.hero;
     }
 
@@ -85,7 +81,7 @@ public class BattlefieldProxy extends AbstractListenableModel implements Battlef
         if (this.hero == hero) {
             return this.battlefield.addExplosive(hero, direction, explosive);
         }
-        throw new RuntimeException("méthode indélicate bloquée par le proxy");
+        return false;
     }
 
     @Override
@@ -93,7 +89,7 @@ public class BattlefieldProxy extends AbstractListenableModel implements Battlef
         if (this.hero == hero) {
             return this.battlefield.moveHero(hero, string);
         }
-        throw new RuntimeException("méthode indélicate bloquée par le proxy");
+        return false;
     }
 
     @Override
@@ -101,7 +97,7 @@ public class BattlefieldProxy extends AbstractListenableModel implements Battlef
         if (this.hero == hero) {
             return this.battlefield.activateShield(hero);
         }
-        throw new RuntimeException("méthode indélicate bloquée par le proxy");
+        return false;
     }
 
     @Override
@@ -109,15 +105,20 @@ public class BattlefieldProxy extends AbstractListenableModel implements Battlef
         if (this.hero == hero) {
             return this.battlefield.shootHero(hero, d);
         }
-        throw new RuntimeException("méthode indélicate bloquée par le proxy");
+        return false;
     }
     
     @Override
     public boolean axAttack(Hero h, String d) {
-        if (this.hero == hero) {
-            return this.battlefield.axAttack(hero, d);
+        if (this.hero == h) {
+            return this.battlefield.axAttack(h, d);
         }
-        throw new RuntimeException("méthode indélicate bloquée par le proxy");
+        return false;
+    }
+
+    @Override
+    public boolean isValidPosition(int x, int y) {
+        return this.battlefield.isValidPosition(x, y);
     }
     
     @Override

@@ -8,7 +8,8 @@ import gridarena.entity.environment.Wall;
 import gridarena.entity.explosive.Barrel;
 import gridarena.entity.explosive.Mine;
 import gridarena.entity.hero.Hero;
-import gridarena.model.BattlefieldProxy;
+import gridarena.entity.hero.HeroFactory;
+import gridarena.model.BattlefieldModel;
 
 import java.util.*;
 
@@ -58,13 +59,13 @@ public class GreedyBotStrategy implements BotStrategy {
     }
 
     @Override
-    public void actionStrategy(BattlefieldProxy battlefieldProxy) {
-        if (battlefieldProxy.getHero() == null) {
-            battlefieldProxy.addHero("warrior");
+    public void actionStrategy(BattlefieldModel battlefieldProxy) {
+        if (battlefieldProxy.getCurrentHero() == null) {
+            battlefieldProxy.addHero(HeroFactory.getFactory("warrior"));
             return;
         }
 
-        Hero hero = battlefieldProxy.getHero();
+        Hero hero = battlefieldProxy.getCurrentHero();
         Entity[][] grid = battlefieldProxy.getGrid();
         int size = grid.length;
 
@@ -73,7 +74,7 @@ public class GreedyBotStrategy implements BotStrategy {
         for (int i = 0; i < directions.length; i++) {
             int nx = hero.getX() + directions[i][0];
             int ny = hero.getY() + directions[i][1];
-            if (nx >= 0 && nx < size && ny >= 0 && ny < size) {
+            if (battlefieldProxy.isValidPosition(nx, ny)) {
                 if (grid[nx][ny] instanceof Hero && grid[nx][ny] != hero) {
                     battlefieldProxy.axAttack(hero, moveDirections[i]);
                     return;
@@ -97,7 +98,7 @@ public class GreedyBotStrategy implements BotStrategy {
         if (hero.getHealthRemaining() < 15) {
             int[] target = this.findNearestTarget(grid, hero, "health");
             if (target != null) {
-                path = this.findPath(grid, hero, target[0], target[1]);
+                path = this.findPath(battlefieldProxy, grid, hero, target[0], target[1]);
             }
         }
 
@@ -105,7 +106,7 @@ public class GreedyBotStrategy implements BotStrategy {
         if ((path == null || path.isEmpty()) && hero.getAmmoRemaining() < 5) {
             int[] target = this.findNearestTarget(grid, hero, "ammo");
             if (target != null) {
-                path = this.findPath(grid, hero, target[0], target[1]);
+                path = this.findPath(battlefieldProxy, grid, hero, target[0], target[1]);
             }
         }
 
@@ -113,7 +114,7 @@ public class GreedyBotStrategy implements BotStrategy {
         if (path == null || path.isEmpty()) {
             int[] target = this.findNearestTarget(grid, hero, "opponent");
             if (target != null) {
-                path = this.findPath(grid, hero, target[0], target[1]);
+                path = this.findPath(battlefieldProxy, grid, hero, target[0], target[1]);
             }
         }
 
@@ -173,7 +174,7 @@ public class GreedyBotStrategy implements BotStrategy {
         return targetPos;
     }
 
-    private List<int[]> findPath(Entity[][] grid, Hero myHero, int targetX, int targetY) {
+    private List<int[]> findPath(BattlefieldModel battlefieldProxy, Entity[][] grid, Hero myHero, int targetX, int targetY) {
         int size = grid.length;
         PriorityQueue<Node> openSet = new PriorityQueue<>();
         boolean[][] closedSet = new boolean[size][size];
@@ -204,7 +205,7 @@ public class GreedyBotStrategy implements BotStrategy {
                 int nx = current.x + dir[0];
                 int ny = current.y + dir[1];
 
-                if (nx >= 0 && nx < size && ny >= 0 && ny < size) {
+                if (battlefieldProxy.isValidPosition(nx, ny)) {
                     if (closedSet[nx][ny]) continue;
 
                     Entity e = grid[nx][ny];
@@ -246,7 +247,7 @@ public class GreedyBotStrategy implements BotStrategy {
         return null;
     }
 
-    private String isTargetInRange(BattlefieldProxy battlefieldProxy, Hero hero) {
+    private String isTargetInRange(BattlefieldModel battlefieldProxy, Hero hero) {
         Entity[][] grid = battlefieldProxy.getGrid();
         int size = grid.length;
         List<String> locations = new ArrayList<>();
@@ -258,7 +259,7 @@ public class GreedyBotStrategy implements BotStrategy {
             for (int j = 0; j < size; j++) {
                 x += directions[i][0];
                 y += directions[i][1];
-                if (x >= 0 && x < size && y >= 0 && y < size) {
+                if (battlefieldProxy.isValidPosition(x, y)) {
                     if (grid[x][y] instanceof Wall) {
                         break;
                     } else if (grid[x][y] instanceof Hero || grid[x][y] instanceof Barrel) {
@@ -275,7 +276,7 @@ public class GreedyBotStrategy implements BotStrategy {
         return "none";
     }
 
-    private String findMineLocation(BattlefieldProxy battlefieldProxy, Hero hero) {
+    private String findMineLocation(BattlefieldModel battlefieldProxy, Hero hero) {
         Entity[][] grid = battlefieldProxy.getGrid();
         int size = grid.length;
         int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}, {1, -1}, {-1, -1}, {-1, 1}, {1, 1}};
@@ -287,7 +288,7 @@ public class GreedyBotStrategy implements BotStrategy {
         for (int i = 0; i < directions.length; i++) {
             int nx = x + directions[i][0];
             int ny = y + directions[i][1];
-            if (nx >= 0 && nx < size && ny >= 0 && ny < size) {
+            if (battlefieldProxy.isValidPosition(nx, ny)) {
                 if (grid[nx][ny] == null) {
                     if (i < 4) {
                         moves.add(explosiveDirections[i]);
@@ -304,7 +305,7 @@ public class GreedyBotStrategy implements BotStrategy {
         return "none";
     }
 
-    private String findAvailableDirection(BattlefieldProxy battlefieldProxy, Hero hero, boolean state) {
+    private String findAvailableDirection(BattlefieldModel battlefieldProxy, Hero hero, boolean state) {
         Entity[][] grid = battlefieldProxy.getGrid();
         int size = grid.length;
         List<String> locations = new ArrayList<>();
@@ -315,7 +316,7 @@ public class GreedyBotStrategy implements BotStrategy {
         for (int i = 0; i < directions.length; i++) {
             int nx = x + directions[i][0];
             int ny = y + directions[i][1];
-            if (nx >= 0 && nx < size && ny >= 0 && ny < size) {
+            if (battlefieldProxy.isValidPosition(nx, ny)) {
                 if (state && grid[nx][ny] instanceof Hero) {
                     locations.add(moveDirections[i]);
                 } else if (!state && (grid[nx][ny] == null || grid[nx][ny] instanceof Consumable || grid[nx][ny] instanceof Mine)) {

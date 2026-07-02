@@ -34,12 +34,12 @@ public interface BattlefieldModel extends ListenableModel {
     GroupHeroesArrayList getHeroes();
     
     /**
-     * Ajouter un héro dans la grille.
+     * Ajouter un hero au champ de bataille.
      * 
-     * @param specialization du hero à ajouter.
+     * @param factory la fabrique de héros.
      * @return le hero ajouté.
      */
-    Hero addHero(String specialization);
+    Hero addHero(HeroFactory factory);
     
     /**
      * Obtenir la grille de jeu.
@@ -101,4 +101,13 @@ public interface BattlefieldModel extends ListenableModel {
      * @return true si le joueur à touché un joueur sinon false.
      */
     boolean axAttack(Hero h, String d);
+
+    /**
+     * Vérifie si une position donnée se trouve dans les limites de la grille.
+     * 
+     * @param x Coordonnée horizontale
+     * @param y Coordonnée verticale
+     * @return true si la position est valide, false sinon
+     */
+    boolean isValidPosition(int x, int y);
 }

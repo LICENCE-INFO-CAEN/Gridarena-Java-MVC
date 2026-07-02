@@ -65,8 +65,8 @@ public class Battlefield extends AbstractListenableModel implements BattlefieldM
     }
     
     @Override
-    public Hero addHero(String specialization) {
-        Hero hero = this.fillStrategy.fillGridWithHero(this.grid, specialization);
+    public Hero addHero(HeroFactory factory) {
+        Hero hero = this.fillStrategy.fillGridWithHero(this.grid, factory);
         this.heroes.addHero(hero);
         this.fireChange();
         return hero;
@@ -80,7 +80,13 @@ public class Battlefield extends AbstractListenableModel implements BattlefieldM
         if(this.isPosition(x, y)) {
             Entity e = this.grid[x][y];
             if (e == null) {
-                Explosive explosive = h.deployExplosive(x, y, explosiveType);
+                Explosive explosive = null;
+                if ("mine".equals(explosiveType) && h.useMine()) {
+                    explosive = new Mine(x, y, h);
+                } else if ("bomb".equals(explosiveType) && h.useBomb()) {
+                    explosive = new Bomb(x, y, h);
+                }
+
                 if (explosive == null) {
                     return false;
                 } else {
@@ -305,6 +311,11 @@ public class Battlefield extends AbstractListenableModel implements BattlefieldM
         return false;
     }
 
+    @Override
+    public boolean isValidPosition(int x, int y) {
+        return x >= 0 && x < this.size && y >= 0 && y < this.size;
+    }
+
     /**
      * Vérifie si une position donnée se trouve dans la grille.
      *
@@ -313,7 +324,7 @@ public class Battlefield extends AbstractListenableModel implements BattlefieldM
      * @return true si la position est dans la grille, false sinon.
      */
     private boolean isPosition(int x, int y) {
-        return x >= 0 && x < this.size && y >= 0 && y < this.size;
+        return this.isValidPosition(x, y);
     }
 
     /**

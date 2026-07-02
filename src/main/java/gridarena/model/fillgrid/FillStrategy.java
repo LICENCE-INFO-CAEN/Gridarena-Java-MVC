@@ -2,6 +2,7 @@ package gridarena.model.fillgrid;
 
 import gridarena.entity.Entity;
 import gridarena.entity.hero.Hero;
+import gridarena.entity.hero.HeroFactory;
 
 /**
  * Représente le remplissage d'une grille avec les entités de base.
@@ -26,9 +27,9 @@ public interface FillStrategy {
      * Remplir la grille avec un héro.
      * 
      * @param grid à remplir.
-     * @param specialization du hero.
+     * @param factory la fabrique de héros.
      * @return le héro inséré dans la grille.
      */
-    Hero fillGridWithHero(Entity[][] grid, String specialization);
+    Hero fillGridWithHero(Entity[][] grid, HeroFactory factory);
     
 }

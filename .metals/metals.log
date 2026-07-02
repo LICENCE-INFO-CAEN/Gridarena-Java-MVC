@@ -10,3 +10,7 @@
 2026.07.02 22:59:41 INFO  time: code lens generation in 1.09s[0m
 2026.07.02 22:59:44 INFO  no build target found for /home/florian/GitHub/Gridarena-Java-MVC/src/gridarena/model/BattlefieldModel.java. Using fallback presentation compiler.[0m
 2026.07.02 23:11:39 INFO  Detected new build tool in /home/florian/GitHub/Gridarena-Java-MVC[0m
+2026.07.02 23:16:26 INFO  Shutting down server[0m
+2026.07.02 23:16:26 INFO  Memory monitor stopped[0m
+2026.07.02 23:16:26 INFO  shutting down Metals[0m
+2026.07.02 23:16:26 INFO  Exiting server[0m

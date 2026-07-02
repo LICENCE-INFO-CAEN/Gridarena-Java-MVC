@@ -43,13 +43,13 @@ public class PatternFillStrategy implements FillStrategy {
     }
 
     @Override
-    public Hero fillGridWithHero(Entity[][] grid, String specialization) {
+    public Hero fillGridWithHero(Entity[][] grid, HeroFactory factory) {
         Random random = new Random();
         int x = random.nextInt(grid.length);
         int y = random.nextInt(grid[0].length);
         while(true) {
             if (grid[x][y] == null) {
-                Hero hero = HeroFactory.getFactory(specialization).createHero(x, y);
+                Hero hero = factory.createHero(x, y);
                 grid[x][y] = hero;
                 return hero;
             } else {

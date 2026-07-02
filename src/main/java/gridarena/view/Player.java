@@ -19,5 +19,16 @@ public interface Player {
      * C'est le tour du joueur.
      */
     void takeMyTurn();
-    
+
+    /**
+     * Afficher le classement de fin de partie.
+     */
+    void showLeaderboard();
+
+    /**
+     * Vérifier si le joueur a un héros.
+     *
+     * @return true si le héros est présent, false sinon.
+     */
+    boolean hasHero();
 }

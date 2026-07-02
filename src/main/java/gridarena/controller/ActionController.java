@@ -1,32 +1,35 @@
 package gridarena.controller;
 
-import gridarena.entity.hero.Hero;
-import gridarena.model.BattlefieldProxy;
-import gridarena.utils.ModelListener;
-import gridarena.view.gui.PlayerGUI;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import gridarena.entity.hero.Hero;
+import gridarena.model.BattlefieldModel;
+import gridarena.utils.ModelListener;
+import gridarena.view.gui.PlayerGUI;
+import gridarena.controller.command.*;
+import gridarena.controller.state.*;
+import java.awt.event.KeyEvent;
 
 /**
  * Représente le contrôleur permettant à un joueur de faire une action (se déplacer, tirer, etc.).
  * 
- * @author Tom David.
- * @version 1.0
+ * @author Tom David, Florian Pépin.
+ * @version 2.0
  */
 public class ActionController extends JPanel implements ActionListener, ModelListener {
     
-    private BattlefieldProxy battlefield;
+    private BattlefieldModel battlefield;
     private GameController game;
     private PlayerGUI playerGUI;
     private String selectedButton = "Bouger";
+    private ControllerState currentState = new MoveState();
     private ArrayList<JButton> actionButtons = new ArrayList<>();
     private ArrayList<JButton> moveButtons = new ArrayList<>();
     private HashMap<String, JLabel> leftAmmos = new HashMap<>();
 
-    public ActionController(BattlefieldProxy battlefield, GameController game, PlayerGUI playerGUI) {
+    public ActionController(BattlefieldModel battlefield, GameController game, PlayerGUI playerGUI) {
         super(new BorderLayout());
         this.battlefield = battlefield;
         this.battlefield.addModelListener(this);
@@ -35,21 +38,19 @@ public class ActionController extends JPanel implements ActionListener, ModelLis
 
         this.setPreferredSize(new Dimension(300, 300));
         JPanel topPanel = new JPanel(new GridLayout(3, 3, 5, 5));
-        createTopButtons(topPanel, this.battlefield.getHero());
+        topPanel.setOpaque(false);
+        createTopButtons(topPanel, this.battlefield.getCurrentHero());
         this.add(topPanel, BorderLayout.NORTH);
 
         JPanel centerPanel = new JPanel(new GridBagLayout());
+        centerPanel.setOpaque(false);
         createMoveButtons(centerPanel);
         this.add(centerPanel, BorderLayout.CENTER);
         updateButtonStates(selectedButton);
+        
+        this.registerKeyBindings();
     }
 
-    /**
-     * Crée les boutons d'actions.
-     *
-     * @param panel dans lequel les boutons seront ajoutés.
-     * @param hero lié aux events des boutons.
-     */
     private void createTopButtons(JPanel panel, Hero hero) {
         HashMap<String, Object> buttonValues = new HashMap<>();
         buttonValues.put("Bouger", "∞");
@@ -62,12 +63,16 @@ public class ActionController extends JPanel implements ActionListener, ModelLis
 
         for (String text : buttonValues.keySet()) {
             JPanel buttonPanel = new JPanel(new BorderLayout());
+            buttonPanel.setOpaque(false);
             JButton button = createButton(text);
             if (text.equals(selectedButton)) {
-                button.setBackground(Color.ORANGE);
+                button.setBackground(new Color(245, 158, 11)); // Amber 500
+                button.setForeground(Color.BLACK);
             }
             actionButtons.add(button);
             JLabel label = new JLabel("Réserve" + ": " + buttonValues.get(text), SwingConstants.CENTER);
+            label.setForeground(new Color(203, 213, 225)); // Slate 300
+            label.setFont(new Font("Segoe UI", Font.PLAIN, 10));
             buttonPanel.add(button, BorderLayout.CENTER);
             buttonPanel.add(label, BorderLayout.SOUTH);
             panel.add(buttonPanel);
@@ -75,11 +80,6 @@ public class ActionController extends JPanel implements ActionListener, ModelLis
         }
     }
 
-    /**
-     * Crée les boutons de déplacement.
-     *
-     * @param panel dans lequel les boutons seront ajoutés.
-     */
     private void createMoveButtons(JPanel panel) {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -87,6 +87,8 @@ public class ActionController extends JPanel implements ActionListener, ModelLis
         String[] directions = {"↑", "→", "↓", "←", "↖", "↗", "↘", "↙", "+"};
         for (int i = 0; i < directions.length; i++) {
             JButton button = createButton(directions[i]);
+            button.setBackground(new Color(15, 23, 42)); // Slate 900
+            button.setFont(new Font("Segoe UI", Font.BOLD, 14));
             gbc.gridx = positions[i][0];
             gbc.gridy = positions[i][1];
             panel.add(button, gbc);
@@ -94,15 +96,49 @@ public class ActionController extends JPanel implements ActionListener, ModelLis
         }
     }
 
-    /**
-     * Créer un bouton.
-     *
-     * @param text à mettre dans le bouton.
-     * @return un bouton.
-     */
     private JButton createButton(String text) {
-        JButton button = new JButton(text);
-        button.setPreferredSize(new Dimension(50, 50));
+        JButton button = new JButton(text) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                Color bg;
+                if (!isEnabled()) {
+                    bg = new Color(51, 65, 85); // Slate 700 (disabled)
+                } else if (getModel().isPressed()) {
+                    bg = getBackground().darker();
+                } else if (getModel().isRollover()) {
+                    bg = getBackground().brighter();
+                } else {
+                    bg = getBackground();
+                }
+
+                g2.setColor(bg);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
+                
+                if (!isEnabled()) {
+                    g2.setColor(new Color(100, 116, 139)); // Slate 500
+                } else {
+                    g2.setColor(getForeground());
+                }
+                g2.setFont(getFont());
+                FontMetrics fm = g2.getFontMetrics();
+                Rectangle stringBounds = fm.getStringBounds(getText(), g2).getBounds();
+                int textX = (getWidth() - stringBounds.width) / 2;
+                int textY = (getHeight() - stringBounds.height) / 2 + fm.getAscent();
+                g2.drawString(getText(), textX, textY);
+                g2.dispose();
+            }
+        };
+        
+        button.setFocusPainted(false);
+        button.setBorderPainted(false);
+        button.setContentAreaFilled(false);
+        button.setOpaque(false);
+        button.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        button.setForeground(new Color(241, 245, 249)); // Slate 100
+        button.setBackground(new Color(71, 85, 105)); // Slate 600 default
         button.addActionListener(this);
         return button;
     }
@@ -116,7 +152,7 @@ public class ActionController extends JPanel implements ActionListener, ModelLis
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        this.setBackground(Color.GRAY);
+        this.setBackground(new Color(30, 41, 59)); // Slate 800
     }
 
     /**
@@ -126,64 +162,139 @@ public class ActionController extends JPanel implements ActionListener, ModelLis
      */
     @Override
     public void actionPerformed(ActionEvent e) {
-        Hero hero = this.battlefield.getHero();
         JButton sourceButton = (JButton) e.getSource();
         String buttonText = sourceButton.getText();
         if (!playerGUI.isMyTurn()) {
             return;
         }
-        boolean valideAction = false;
+        
         if (buttonText.equals("Passer")) {
-            valideAction = true;
-        } else if (actionButtons.contains(sourceButton)) {
-            selectedButton = buttonText;
-            updateButtonColors();
-            updateButtonStates(buttonText);
+            executeCommand(new PassCommand());
             return;
         }
-        if (!valideAction) {
-            switch (selectedButton) {
-                case "Tirer":
-                    this.useShoot(buttonText, hero);
-                    valideAction = true;
-                    break;
-                case "Mine":
-                    valideAction = this.useExplosive(buttonText, hero, "mine");
-                    break;
-                case "Bombe":
-                    valideAction = this.useExplosive(buttonText, hero, "bomb");
-                    break;
-                case "Bouclier":
-                    valideAction = this.useShield(buttonText, hero);
-                    break;
-                case "Bouger":
-                    valideAction = this.useMove(buttonText, hero);
-                    break;
-                case "Hache":
-                    this.useAx(buttonText, hero);
-                    valideAction = true;
-                    break;
-                default:
-                    throw new IllegalArgumentException("Action invalide.");
+        
+        // Clic sur un bouton d'action principal
+        for (JButton btn : actionButtons) {
+            if (btn == sourceButton) {
+                selectActionByName(buttonText);
+                return;
             }
         }
-        if (valideAction) {
+        
+        // Sinon, c'est un bouton de direction
+        String dir = getDirectionFromSymbol(buttonText);
+        triggerDirection(dir);
+    }
+
+    private void selectActionByName(String name) {
+        selectedButton = name;
+        switch (name) {
+            case "Bouger":
+                currentState = new MoveState();
+                break;
+            case "Tirer":
+                currentState = new ShootState();
+                break;
+            case "Mine":
+                currentState = new MineState();
+                break;
+            case "Bombe":
+                currentState = new BombState();
+                break;
+            case "Bouclier":
+                currentState = new ShieldState();
+                break;
+            case "Hache":
+                currentState = new AxAttackState();
+                break;
+        }
+        updateButtonColors();
+        updateButtonStates(name);
+    }
+
+    private void triggerDirection(String direction) {
+        Hero hero = this.battlefield.getCurrentHero();
+        Command cmd = this.currentState.getCommandForDirection(this.battlefield, hero, direction);
+        executeCommand(cmd);
+    }
+
+    private void executeCommand(Command cmd) {
+        if (cmd != null && cmd.execute()) {
             playerGUI.setMyTurn(false);
-            synchronized (this.game) {
-                game.notifyAll();
-            }
+            playerGUI.signalTurnDone();
             updateButtonEnabled();
         }
     }
+
+    private void registerKeyBindings() {
+        InputMap inputMap = this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        ActionMap actionMap = this.getActionMap();
+
+        // Raccourcis clavier (touches 1 à 6 pour changer de mode)
+        String[] actions = {"Bouger", "Tirer", "Mine", "Bombe", "Bouclier", "Hache"};
+        int[] keyCodes = {KeyEvent.VK_1, KeyEvent.VK_2, KeyEvent.VK_3, KeyEvent.VK_4, KeyEvent.VK_5, KeyEvent.VK_6};
+        for (int i = 0; i < actions.length; i++) {
+            final String actionName = actions[i];
+            inputMap.put(KeyStroke.getKeyStroke(keyCodes[i], 0), "select_" + actionName);
+            actionMap.put("select_" + actionName, new AbstractAction() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if (playerGUI.isMyTurn()) {
+                        selectActionByName(actionName);
+                    }
+                }
+            });
+        }
+        
+        // Passer son tour avec 'P' ou 'Entrée'
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_P, 0), "pass_turn");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "pass_turn");
+        actionMap.put("pass_turn", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (playerGUI.isMyTurn()) {
+                    executeCommand(new PassCommand());
+                }
+            }
+        });
+
+        // Touches de direction (Flèches et ZQSD/WASD)
+        String[] directions = {"up", "right", "down", "left"};
+        int[][] directionKeys = {
+            {KeyEvent.VK_UP, KeyEvent.VK_Z, KeyEvent.VK_W},
+            {KeyEvent.VK_RIGHT, KeyEvent.VK_D, KeyEvent.VK_D},
+            {KeyEvent.VK_DOWN, KeyEvent.VK_S, KeyEvent.VK_S},
+            {KeyEvent.VK_LEFT, KeyEvent.VK_Q, KeyEvent.VK_A}
+        };
+
+        for (int i = 0; i < directions.length; i++) {
+            final String dir = directions[i];
+            for (int keyCode : directionKeys[i]) {
+                String actionKey = "press_" + dir + "_" + keyCode;
+                inputMap.put(KeyStroke.getKeyStroke(keyCode, 0), actionKey);
+                actionMap.put(actionKey, new AbstractAction() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        if (playerGUI.isMyTurn()) {
+                            triggerDirection(dir);
+                        }
+                    }
+                });
+            }
+        }
+    }
+
     /**
      * Met à jour la couleur des boutons d'actions.
      */
     private void updateButtonColors() {
         for (JButton button : actionButtons) {
             if (button.getText().equals(selectedButton)) {
-                button.setBackground(Color.ORANGE);
+                button.setBackground(new Color(245, 158, 11)); // Amber 500
+                button.setForeground(Color.BLACK);
             } else {
-                button.setBackground(null);
+                button.setBackground(new Color(71, 85, 105)); // Slate 600
+                button.setForeground(new Color(241, 245, 249)); // Slate 100
             }
         }
     }
@@ -263,122 +374,20 @@ public class ActionController extends JPanel implements ActionListener, ModelLis
         }
     }
 
-
     /**
-     * Utiliser le déplacement du joueur.
-     *
-     * @param direction dans laquelle le joueur veut se déplacer.
-     * @param hero qui souhaite se déplacer.
-     * @return true si le déplacement a été effectué sinon false.
+     * Traduit le symbole de direction Swing en chaîne compréhensible par le modèle.
      */
-    private boolean useMove(String direction, Hero hero) {
-        switch (direction) {
-            case "↑":
-                return this.battlefield.moveHero(hero, "up");
-            case "→":
-                return this.battlefield.moveHero(hero, "right");
-            case "↓":
-                return this.battlefield.moveHero(hero, "down");
-            case "←":
-                return this.battlefield.moveHero(hero, "left");
-            default:
-                return false;
-        }
-    }
-
-
-    /**
-     * Utiliser le tir du joueur.
-     *
-     * @param direction dans laquelle le joueur veut tirer.
-     * @param hero qui souhaite tirer.
-     */
-    private void useShoot(String direction, Hero hero) {
-        switch (direction) {
-            case "↑":
-                this.battlefield.shootHero(hero, "up");
-                break;
-            case "→":
-                this.battlefield.shootHero(hero, "right");
-                break;
-            case "↓":
-                this.battlefield.shootHero(hero, "down");
-                break;
-            case "←":
-                this.battlefield.shootHero(hero, "left");
-                break;
-        }
-    }
-
-
-    /**
-     * Utiliser un explosif.
-     *
-     * @param direction dans laquelle le joueur veut poser un explosif.
-     * @param hero qui souhaite poser un explosif.
-     * @param explosive a poser.
-     * @return true si l'explosif a pu être posé sinon false.
-     */
-
-    private boolean useExplosive(String direction, Hero hero, String explosive) {
-        switch (direction) {
-            case "↑":
-                return this.battlefield.addExplosive(hero, "up", explosive);
-            case "→":
-                return this.battlefield.addExplosive(hero, "right", explosive);
-            case "↓":
-                return this.battlefield.addExplosive(hero, "down", explosive);
-            case "←":
-                return this.battlefield.addExplosive(hero, "left", explosive);
-            case "↖":
-                return this.battlefield.addExplosive(hero, "lu", explosive);
-            case "↗":
-                return this.battlefield.addExplosive(hero, "ru", explosive);
-            case "↘":
-                return this.battlefield.addExplosive(hero, "rd", explosive);
-            case "↙":
-                return this.battlefield.addExplosive(hero, "ld", explosive);
-            default:
-                return true;
-        }
-    }
-
-/**
-     * Utiliser un coup de hache.
-     *
-     * @param direction dans laquelle le joueur veut frapper.
-     * @param hero qui souhaite utiliser la hache.
-     */
-    private void useAx(String direction, Hero hero) {
-        switch (direction) {
-            case "↑":
-                this.battlefield.axAttack(hero, "up");
-                break;
-            case "→":
-                this.battlefield.axAttack(hero, "right");
-                break;
-            case "↓":
-                this.battlefield.axAttack(hero, "down");
-                break;
-            case "←":
-                this.battlefield.axAttack(hero, "left");
-                break;
-        }
-    }
-
-    /**
-     * Activer le bouclier du joueur.
-     *
-     * @param direction du bouclier.
-     * @param hero qui souhaite activer le bouclier.
-     * @return true si le bouclier a été activé sinon false.
-     */
-    private boolean useShield(String direction, Hero hero) {
-        switch (direction) {
-            case "+":
-                return this.battlefield.activateShield(hero);
-            default:
-                return true;
+    private String getDirectionFromSymbol(String symbol) {
+        switch (symbol) {
+            case "↑": return "up";
+            case "→": return "right";
+            case "↓": return "down";
+            case "←": return "left";
+            case "↖": return "lu";
+            case "↗": return "ru";
+            case "↘": return "rd";
+            case "↙": return "ld";
+            default: return "";
         }
     }
     /**
@@ -386,7 +395,7 @@ public class ActionController extends JPanel implements ActionListener, ModelLis
      */
     @Override
     public void updatedModel(Object source) {
-        Hero hero = this.battlefield.getHero();
+        Hero hero = this.battlefield.getCurrentHero();
         leftAmmos.get("Mine").setText("Réserve: " + hero.getMineRemaining());
         leftAmmos.get("Bombe").setText("Réserve: " + hero.getBombRemaining());
         leftAmmos.get("Bouclier").setText("Réserve: " + hero.getShieldRemaining());
