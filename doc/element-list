@@ -1,6 +1,8 @@
 gridarena
 gridarena.controller
 gridarena.controller.bot
+gridarena.controller.command
+gridarena.controller.state
 gridarena.entity
 gridarena.entity.consumable
 gridarena.entity.environment
