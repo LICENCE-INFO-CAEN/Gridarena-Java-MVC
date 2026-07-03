@@ -1,12 +1,12 @@
 package gridarena.controller;
 
 import gridarena.controller.bot.*;
+import gridarena.controller.cli.PlayerCLIController;
+import gridarena.controller.gui.PlayerGUIController;
 import gridarena.entity.hero.*;
 import gridarena.model.*;
 import gridarena.model.fillgrid.*;
 import gridarena.view.*;
-import gridarena.view.gui.*;
-import gridarena.view.cli.*;
 
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
@@ -65,14 +65,12 @@ public class GameController implements Runnable {
         this.running = false;
         this.gameStarted = false;
         for (Player p : this.playersHistory) {
-            if (p instanceof PlayerGUI) {
-                ((PlayerGUI) p).disposeFrame();
-            }
+            p.cleanUp();
         }
         // Interrompt le thread de jeu :
         //  - débloque CountDownLatch.await() (Phase 1)
-        //  - débloque SynchronousQueue.take()  (Phase 2 via PlayerGUI.takeMyTurn)
-        //  - débloque Thread.sleep()           (PlayerBot)
+        //  - débloque SynchronousQueue.take()  (Phase 2 via PlayerGUIController.takeMyTurn)
+        //  - débloque Thread.sleep()           (PlayerBotController)
         if (this.gameThread != null) {
             this.gameThread.interrupt();
         }
@@ -97,11 +95,11 @@ public class GameController implements Runnable {
         this.heroSelectionLatch = new CountDownLatch(this.guiPlayers);
         for (int i = 0; i < this.guiPlayers+this.cliPlayers+this.botPlayers; i++) {
             if (i < this.guiPlayers) {
-                this.addPlayer(new PlayerGUI(this, new BattlefieldProxy(this.battlefield), "J"+(i+1), this.heroSelectionLatch));
+                this.addPlayer(new PlayerGUIController(this, new BattlefieldProxy(this.battlefield), "J"+(i+1), this.heroSelectionLatch));
             } else if (i < this.guiPlayers+this.cliPlayers) {
-                this.addPlayer(new PlayerCLI(this, new BattlefieldProxy(this.battlefield), "J"+(i+1)));
+                this.addPlayer(new PlayerCLIController(this, new BattlefieldProxy(this.battlefield), "J"+(i+1)));
             } else {
-                this.addPlayer(new PlayerBot(this, new BattlefieldProxy(this.battlefield), "Bot"+(i+1), botStrategy));
+                this.addPlayer(new PlayerBotController(this, new BattlefieldProxy(this.battlefield), "Bot"+(i+1), botStrategy));
             }
         }
         this.gameThread = new Thread(this);
@@ -170,7 +168,7 @@ public class GameController implements Runnable {
         // Auto-sélection pour les robots
         for (Player p : this.players) {
             if (!this.running) return;
-            if (p instanceof PlayerBot) {
+            if (p instanceof PlayerBotController) {
                 p.takeMyTurn();
             }
         }
@@ -178,7 +176,7 @@ public class GameController implements Runnable {
         // Sélection séquentielle pour les joueurs console (partage de System.in)
         for (Player p : this.players) {
             if (!this.running) return;
-            if (p instanceof PlayerCLI) {
+            if (p instanceof PlayerCLIController) {
                 p.takeMyTurn();
             }
         }
@@ -197,9 +195,7 @@ public class GameController implements Runnable {
         
         // Affichage du plateau de jeu principal pour tous les joueurs graphiques
         for (Player p : this.players) {
-            if (p instanceof PlayerGUI) {
-                ((PlayerGUI) p).showGameplay();
-            }
+            p.showGameplay();
         }
         
         // Phase 2 : Déroulement du jeu au tour par tour
@@ -221,9 +217,7 @@ public class GameController implements Runnable {
         if (this.running) {
             for (Player player : this.playersHistory) {
                 player.showLeaderboard();
-                if (player instanceof PlayerGUI) {
-                    ((PlayerGUI) player).disposeFrame();
-                }
+                player.cleanUp();
             }
             if (this.onGameFinishedCallback != null) {
                 String winnerName = null;

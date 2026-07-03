@@ -8,7 +8,7 @@ import gridarena.entity.hero.Hero;
 import gridarena.model.BattlefieldModel;
 import gridarena.utils.ModelListener;
 import gridarena.view.UITheme;
-import gridarena.view.gui.PlayerGUI;
+import gridarena.controller.gui.PlayerGUIController;
 import gridarena.controller.command.*;
 import gridarena.controller.state.*;
 import java.awt.event.KeyEvent;
@@ -23,14 +23,14 @@ public class ActionController extends JPanel implements ActionListener, ModelLis
     
     private BattlefieldModel battlefield;
     private GameController game;
-    private PlayerGUI playerGUI;
+    private PlayerGUIController playerGUI;
     private String selectedButton = "Bouger";
     private ControllerState currentState = new MoveState();
     private ArrayList<JButton> actionButtons = new ArrayList<>();
     private ArrayList<JButton> moveButtons = new ArrayList<>();
     private HashMap<String, JLabel> leftAmmos = new HashMap<>();
 
-    public ActionController(BattlefieldModel battlefield, GameController game, PlayerGUI playerGUI) {
+    public ActionController(BattlefieldModel battlefield, GameController game, PlayerGUIController playerGUI) {
         super(new BorderLayout());
         this.battlefield = battlefield;
         this.battlefield.addModelListener(this);

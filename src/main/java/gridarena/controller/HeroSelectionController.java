@@ -1,7 +1,7 @@
 package gridarena.controller;
 
 import gridarena.model.BattlefieldModel;
-import gridarena.view.gui.PlayerGUI;
+import gridarena.controller.gui.PlayerGUIController;
 import gridarena.entity.hero.HeroFactory;
 import gridarena.entity.hero.CustomHeroFactory;
 import gridarena.view.UITheme;
@@ -20,7 +20,7 @@ public class HeroSelectionController extends JPanel {
     
     private BattlefieldModel battlefield;
     private GameController game;
-    private PlayerGUI playerGUI;
+    private PlayerGUIController playerGUI;
 
     private int pointsLeft = 10;
     private int ptsHp = 0;
@@ -38,7 +38,7 @@ public class HeroSelectionController extends JPanel {
     private JButton btnBombPlus, btnBombMinus;
     private JButton btnCreateCustom;
     
-    public HeroSelectionController(BattlefieldModel battlefield, GameController game, PlayerGUI playerGUI) {
+    public HeroSelectionController(BattlefieldModel battlefield, GameController game, PlayerGUIController playerGUI) {
         super(new BorderLayout(15, 15));
         this.battlefield = battlefield;
         this.game = game;

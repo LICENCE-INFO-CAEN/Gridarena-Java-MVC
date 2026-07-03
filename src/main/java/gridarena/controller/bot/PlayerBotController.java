@@ -1,23 +1,23 @@
 package gridarena.controller.bot;
 
 import gridarena.controller.GameController;
+import gridarena.controller.Player;
 import gridarena.model.BattlefieldModel;
-import gridarena.view.Player;
 
 /**
- * Représente un joueur robot.
+ * Représente un joueur robot (Contrôleur).
  *
  * @author Florian Pépin.
- * @version 1.0
+ * @version 2.0
  */
-public class PlayerBot implements Player {
+public class PlayerBotController implements Player {
 
     private GameController gameController;
     private BattlefieldModel battlefieldProxy;
     private String name;
     private BotStrategy botStrategy;
 
-    public PlayerBot(GameController gameController, BattlefieldModel battlefieldProxy, String name, BotStrategy botStrategy) {
+    public PlayerBotController(GameController gameController, BattlefieldModel battlefieldProxy, String name, BotStrategy botStrategy) {
         this.gameController = gameController;
         this.battlefieldProxy = battlefieldProxy;
         this.name = name;
@@ -38,11 +38,6 @@ public class PlayerBot implements Player {
             // Partie arrêtée pendant le sleep du bot
             Thread.currentThread().interrupt();
         }
-    }
-
-    @Override
-    public void showLeaderboard() {
-        // Les bots n'ont pas d'interface graphique ou textuelle pour afficher le classement.
     }
 
     @Override

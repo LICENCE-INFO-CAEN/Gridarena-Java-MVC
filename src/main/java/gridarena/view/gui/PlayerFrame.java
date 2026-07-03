@@ -9,6 +9,8 @@ import gridarena.view.LeaderboardView;
 import gridarena.view.StatisticView;
 import gridarena.view.UITheme;
 
+import gridarena.controller.gui.PlayerGUIController;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -22,10 +24,10 @@ public class PlayerFrame extends JFrame {
     
     private final BattlefieldModel battlefield;
     private final GameController gameController;
-    private final PlayerGUI playerGUI;
+    private final PlayerGUIController playerGUI;
     private final String name;
 
-    public PlayerFrame(GameController gameController, BattlefieldModel battlefield, PlayerGUI playerGUI, String name) {
+    public PlayerFrame(GameController gameController, BattlefieldModel battlefield, PlayerGUIController playerGUI, String name) {
         super("Grid Arena : " + name);
         this.gameController = gameController;
         this.battlefield = battlefield;

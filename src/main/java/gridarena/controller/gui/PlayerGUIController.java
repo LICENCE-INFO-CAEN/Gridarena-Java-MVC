@@ -1,14 +1,15 @@
-package gridarena.view.gui;
+package gridarena.controller.gui;
 
 import gridarena.controller.GameController;
+import gridarena.controller.Player;
 import gridarena.model.BattlefieldModel;
-import gridarena.view.Player;
+import gridarena.view.gui.PlayerFrame;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.SynchronousQueue;
 
 /**
- * Représente l'interface utilisateur et le contrôleur de tour d'un joueur graphique.
+ * Représente le contrôleur de tour et de synchronisation d'un joueur graphique.
  * Déploie et délègue l'affichage à un composant PlayerFrame dédié.
  *
  * Synchronisation :
@@ -19,7 +20,7 @@ import java.util.concurrent.SynchronousQueue;
  * @author Tom David et Florian Pépin.
  * @version 3.0
  */
-public class PlayerGUI implements Player {
+public class PlayerGUIController implements Player {
     
     private final GameController gameController;
     private final BattlefieldModel battlefield;
@@ -33,7 +34,7 @@ public class PlayerGUI implements Player {
     /** Verrou décrémenté lors de la confirmation du héros (Phase 1). */
     private final CountDownLatch heroSelectionLatch;
 
-    public PlayerGUI(GameController gameController, BattlefieldModel battlefield, String name, CountDownLatch heroSelectionLatch) {
+    public PlayerGUIController(GameController gameController, BattlefieldModel battlefield, String name, CountDownLatch heroSelectionLatch) {
         this.gameController = gameController;
         this.battlefield = battlefield;
         this.name = name;
@@ -113,7 +114,8 @@ public class PlayerGUI implements Player {
         return this.battlefield.getCurrentHero() != null;
     }
 
-    public void disposeFrame() {
+    @Override
+    public void cleanUp() {
         this.frame.disposeFrame();
     }
     

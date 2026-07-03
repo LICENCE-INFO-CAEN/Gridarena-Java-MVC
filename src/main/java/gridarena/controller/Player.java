@@ -1,10 +1,10 @@
-package gridarena.view;
+package gridarena.controller;
 
 /**
  * Représente le joueur qui joue au jeu.
  * 
- * @author Tom David.
- * @version 1.0
+ * @author Tom David, Florian Pépin.
+ * @version 2.0
  */
 public interface Player {
 
@@ -22,8 +22,9 @@ public interface Player {
 
     /**
      * Afficher le classement de fin de partie.
+     * Par défaut, ne fait rien (ex: pour les robots).
      */
-    void showLeaderboard();
+    default void showLeaderboard() {}
 
     /**
      * Vérifier si le joueur a un héros.
@@ -31,4 +32,16 @@ public interface Player {
      * @return true si le héros est présent, false sinon.
      */
     boolean hasHero();
+
+    /**
+     * Libère les ressources du joueur (ex: fermeture des fenêtres).
+     * Par défaut, ne fait rien.
+     */
+    default void cleanUp() {}
+
+    /**
+     * Affiche l'écran de gameplay.
+     * Par défaut, ne fait rien.
+     */
+    default void showGameplay() {}
 }

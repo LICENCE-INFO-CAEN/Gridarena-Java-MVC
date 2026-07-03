@@ -1,27 +1,27 @@
-package gridarena.view.cli;
+package gridarena.controller.cli;
 
-import gridarena.controller.*;
+import gridarena.controller.GameController;
+import gridarena.controller.Player;
 import gridarena.controller.command.*;
 import gridarena.entity.hero.*;
 import gridarena.model.*;
-import gridarena.view.*;
 
-import java.util.*;
+import java.util.Scanner;
 
 /**
- * Représente l'interface utilisateur d'un joueur en ligne de commandes.
+ * Représente l'interface utilisateur d'un joueur en ligne de commandes (Contrôleur).
  *
- * @author Emilien Huron.
- * @version 1.0
+ * @author Emilien Huron, Florian Pépin.
+ * @version 2.0
  */
-public class PlayerCLI implements Player {
+public class PlayerCLIController implements Player {
     
     private GameController gameController;
     private BattlefieldModel battlefieldProxy;
     private String name;
     private Scanner scanner;
 
-    public PlayerCLI(GameController gameController, BattlefieldModel battlefieldProxy, String name) {
+    public PlayerCLIController(GameController gameController, BattlefieldModel battlefieldProxy, String name) {
         this.gameController = gameController;
         this.battlefieldProxy = battlefieldProxy;
         this.name = name;
