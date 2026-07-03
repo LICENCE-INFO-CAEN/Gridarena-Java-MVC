@@ -55,16 +55,46 @@ public class BattlefieldView extends JPanel implements ModelListener {
                     if (map[i][j] != null) {
                         String imageUrl = map[i][j].getImageUrl();
                         Image img = new ImageIcon(getClass().getResource(imageUrl)).getImage();
-                        if (map[i][j] instanceof Barrel) {
-                            g.drawImage(img, (x + cellWidth / 2)-20, y + cellHeight / 5 - 6, 22 * 2, 26 * 2, null);
-                        } else if (map[i][j] instanceof Wall) {
-                            g.drawImage(img, x+8, y, cellWidth-15, cellHeight, null);
-                        } else if (map[i][j] instanceof Explosive) {
-                            g.drawImage(img, x + cellWidth / 5, y + cellHeight / 5, cellWidth-20, cellHeight-20, null);
-                        } else if (map[i][j] instanceof Consumable) {
-                            g.drawImage(img, x + cellWidth / 5, y + cellHeight / 5, 50, 50, null);
-                        } else if(map[i][j] instanceof Hero) {
-                            g.drawImage(img, x+20, y+9, 13 * 2, 26 * 2, null);
+                        if (map[i][j] instanceof Wall) {
+                            // Les murs remplissent entièrement la case pour se toucher correctement
+                            g.drawImage(img, x, y, cellWidth, cellHeight, null);
+                        } else {
+                            // Détermination du facteur d'échelle selon le type d'entité
+                            double scaleFactor = 0.75;
+                            if (map[i][j] instanceof Hero) {
+                                scaleFactor = 0.85;
+                            } else if (map[i][j] instanceof Explosive) {
+                                scaleFactor = 0.6;
+                            } else if (map[i][j] instanceof Consumable) {
+                                scaleFactor = 0.65;
+                            }
+
+                            int maxW = (int) (cellWidth * scaleFactor);
+                            int maxH = (int) (cellHeight * scaleFactor);
+
+                            int imgWidth = img.getWidth(null);
+                            int imgHeight = img.getHeight(null);
+                            if (imgWidth <= 0 || imgHeight <= 0) {
+                                imgWidth = 50;
+                                imgHeight = 50;
+                            }
+
+                            double imgRatio = (double) imgWidth / imgHeight;
+                            double cellRatio = (double) maxW / maxH;
+
+                            int drawW, drawH;
+                            if (imgRatio > cellRatio) {
+                                drawW = maxW;
+                                drawH = (int) (maxW / imgRatio);
+                            } else {
+                                drawH = maxH;
+                                drawW = (int) (maxH * imgRatio);
+                            }
+
+                            int drawX = x + (cellWidth - drawW) / 2;
+                            int drawY = y + (cellHeight - drawH) / 2;
+
+                            g.drawImage(img, drawX, drawY, drawW, drawH, null);
                         }
                     }
                 }

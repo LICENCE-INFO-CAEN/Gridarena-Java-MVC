@@ -35,8 +35,8 @@ Ce projet sert de démonstrateur pour l'application pratique des patrons de conc
 ### Vue du Joueur (Brouillard de guerre)
 ![vue-joueur](./screenshots/vue-joueur.png)
 
-### Vue Générale (Arbitre / Spectateur)
-![vue-jeu-complet](./screenshots/vue-jeu-complet.png)
+### Vue Panel Admin (Arbitre / Spectateur)
+![vue-panel-admin](./screenshots/panel-admin.png)
 
 ### Sélection du Personnage
 ![choisir personnage](./screenshots/choisir-personnage.png)
