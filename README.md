@@ -1,4 +1,4 @@
-# Gridarena — Jeu de combat au tour par tour (MVC & Design Patterns)
+# Gridarena - Jeu de combat au tour par tour
 
 ## Description
 

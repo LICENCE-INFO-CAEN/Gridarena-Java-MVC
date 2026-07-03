@@ -15,7 +15,7 @@ public abstract class Entity extends AbstractListenableModel {
     protected final String emote;
     protected final boolean walkable;
     protected final String image;
-    private static final String PATH_IMAGE = "/resources/images/";
+    private static final String PATH_IMAGE = "/images/";
 
     public Entity(int x, int y, String emote, String image, boolean walkable) {
         this.x = x;

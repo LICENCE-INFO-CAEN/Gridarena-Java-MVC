@@ -50,7 +50,7 @@ public class BattlefieldView extends JPanel implements ModelListener {
             int startX = (getWidth() - actualBoardWidth) / 2;
             int startY = (getHeight() - actualBoardHeight) / 2;
             
-            Image background = new ImageIcon(getClass().getResource("/resources/images/ground.png")).getImage();
+            Image background = new ImageIcon(getClass().getResource("/images/ground.png")).getImage();
             
             for (int i = 0; i < map.length; i++) {
                 for (int j = 0; j < map[i].length; j++) {

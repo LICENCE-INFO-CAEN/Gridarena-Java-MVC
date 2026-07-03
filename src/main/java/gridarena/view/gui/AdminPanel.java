@@ -37,7 +37,7 @@ public class AdminPanel extends JFrame {
     private JTable statsTable;
 
     public AdminPanel() {
-        super("Grid Arena — Panel Admin");
+        super("Panel Admin");
         this.controller = new AdminController(this);
 
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -50,7 +50,7 @@ public class AdminPanel extends JFrame {
         JPanel titleBar = new JPanel(new BorderLayout());
         titleBar.setBackground(UITheme.ACCENT);
         titleBar.setPreferredSize(new Dimension(0, 36));
-        JLabel titleLabel = new JLabel("  ▮  GRID ARENA  —  ADMIN PANEL");
+        JLabel titleLabel = new JLabel("  ▮  PANEL ADMIN");
         titleLabel.setFont(UITheme.FONT_BADGE);
         titleLabel.setForeground(UITheme.TEXT_PRIMARY);
         titleBar.add(titleLabel, BorderLayout.WEST);
