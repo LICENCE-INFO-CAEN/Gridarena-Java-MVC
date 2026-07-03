@@ -1,15 +1,10 @@
 # Gridarena — Jeu de combat au tour par tour (MVC & Design Patterns)
 
-[![Java Version](https://img.shields.io/badge/Java-21-blue.svg)](https://www.oracle.com/java/technologies/downloads/)
-[![Build System](https://img.shields.io/badge/Build-Maven-orange.svg)](https://maven.apache.org/)
-[![Design Patterns](https://img.shields.io/badge/Patterns-MVC%20%7C%20Factory%20Method%20%7C%20Proxy%20%7C%20Strategy-green.svg)](#architecture-et-design-patterns)
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE.md)
-
 ## Description
 
 **Gridarena** est un jeu de combat tactique au tour par tour développé en Java. Ce projet implémente une architecture **MVC (Modèle-Vue-Contrôleur)** robuste et intègre plusieurs **Design Patterns** fondamentaux. 
 
-Les joueurs (humains, CLI ou bots intelligents) s'affrontent sur une grille bidimensionnelle parsemée d'obstacles et de bonus, en utilisant diverses compétences tactiques (tir, hache, bombes, mines, bouclier).
+Les joueurs s'affrontent sur une grille bidimensionnelle parsemée d'obstacles et de bonus, en utilisant diverses compétences tactiques (tir, hache, bombes, mines, bouclier).
 
 ## Captures d'Écran
 

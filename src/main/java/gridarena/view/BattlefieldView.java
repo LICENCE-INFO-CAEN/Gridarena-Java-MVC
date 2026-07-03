@@ -38,15 +38,24 @@ public class BattlefieldView extends JPanel implements ModelListener {
      */
     public void displayMap(Graphics g, Entity[][] map, Hero currentHero) {
         if (map != null) {
-            int cellWidth = getWidth() / map[0].length;
-            int cellHeight = getHeight() / map.length;
+            int boardSize = Math.min(getWidth(), getHeight());
+            int cellWidth = boardSize / map[0].length;
+            int cellHeight = boardSize / map.length;
+            
+            // Taille réelle calculée pour le plateau
+            int actualBoardWidth = cellWidth * map[0].length;
+            int actualBoardHeight = cellHeight * map.length;
+            
+            // Centrage de la grille
+            int startX = (getWidth() - actualBoardWidth) / 2;
+            int startY = (getHeight() - actualBoardHeight) / 2;
             
             Image background = new ImageIcon(getClass().getResource("/resources/images/ground.png")).getImage();
             
             for (int i = 0; i < map.length; i++) {
                 for (int j = 0; j < map[i].length; j++) {
-                    int x = j * cellWidth;
-                    int y = i * cellHeight;
+                    int x = startX + j * cellWidth;
+                    int y = startY + i * cellHeight;
                     g.drawImage(background, x, y, cellWidth, cellHeight, null);
                     
                     g.setColor(new Color(0x3A, 0x3A, 0x3C, 80)); // BORDER semi-transparent
@@ -106,24 +115,24 @@ public class BattlefieldView extends JPanel implements ModelListener {
                 g2.setColor(UITheme.ACCENT);
                 g2.setStroke(new BasicStroke(3f));
                 g2.drawRect(
-                    currentHero.getY() * cellWidth + 2,
-                    currentHero.getX() * cellHeight + 2,
+                    startX + currentHero.getY() * cellWidth + 2,
+                    startY + currentHero.getX() * cellHeight + 2,
                     cellWidth - 4, cellHeight - 4
                 );
                 // Coin haut-gauche accent
                 g2.setColor(UITheme.ACCENT_HOVER);
                 g2.setStroke(new BasicStroke(4f));
                 g2.drawLine(
-                    currentHero.getY() * cellWidth + 2,
-                    currentHero.getX() * cellHeight + 2,
-                    currentHero.getY() * cellWidth + 10,
-                    currentHero.getX() * cellHeight + 2
+                    startX + currentHero.getY() * cellWidth + 2,
+                    startY + currentHero.getX() * cellHeight + 2,
+                    startX + currentHero.getY() * cellWidth + 10,
+                    startY + currentHero.getX() * cellHeight + 2
                 );
                 g2.drawLine(
-                    currentHero.getY() * cellWidth + 2,
-                    currentHero.getX() * cellHeight + 2,
-                    currentHero.getY() * cellWidth + 2,
-                    currentHero.getX() * cellHeight + 10
+                    startX + currentHero.getY() * cellWidth + 2,
+                    startY + currentHero.getX() * cellHeight + 2,
+                    startX + currentHero.getY() * cellWidth + 2,
+                    startY + currentHero.getX() * cellHeight + 10
                 );
                 g2.dispose();
             }
