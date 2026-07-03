@@ -1,5 +1,6 @@
 package gridarena.entity.explosive;
 
+import gridarena.entity.EntityVisitor;
 import gridarena.entity.hero.Hero;
 
 /**
@@ -22,6 +23,11 @@ public class Bomb extends Explosive {
     public Bomb(int x, int y, Hero belongsTo) {
         super(x, y, belongsTo, "💣", Bomb.EXPLOSION_RADIUS, Bomb.DAMAGES, false, "bomb.png");
         this.explosionDelay = Bomb.EXPLOSION_DELAY;
+    }
+
+    @Override
+    public void accept(EntityVisitor visitor) {
+        visitor.visit(this);
     }
 
     public int getExplosionDelay() {

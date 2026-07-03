@@ -1,6 +1,7 @@
 package gridarena.entity.hero;
 
 import gridarena.entity.Entity;
+import gridarena.entity.EntityVisitor;
 
 /**
  * Représente le Hero que le joueur incarne.
@@ -287,6 +288,11 @@ public abstract class Hero extends Entity {
      */
     public void axAttack(Hero h) {
         h.setHealthRemaining(h.getHealthRemaining()-Hero.AX_DAMAGE);
+    }
+       
+    @Override
+    public void accept(EntityVisitor visitor) {
+        visitor.visit(this);
     }
        
 

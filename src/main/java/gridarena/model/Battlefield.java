@@ -11,19 +11,21 @@ import gridarena.utils.AbstractListenableModel;
 import java.util.*;
 
 /**
- * Représente un champ de bataille.
+ * Représente un champ de bataille (Modèle).
+ * Gère uniquement la logique métier globale et les règles du combat.
+ * Délégué la gestion géométrique et spatiale à un GridManager.
+ * Utilise des classes de visiteurs dédiées pour implémenter ses règles.
  *
  * @author Florian Pépin.
- * @version 2.0
+ * @version 4.0
  */
 public class Battlefield extends AbstractListenableModel implements BattlefieldModel {
     
-    private FillStrategy fillStrategy;
+    private final FillStrategy fillStrategy;
+    private final GroupHeroesArrayList heroes;
+    private final List<Bomb> bombs;
+    private final GridManager gridManager;
     private Hero currentHero;
-    private GroupHeroesArrayList heroes;
-    private List<Bomb> bombs;
-    private Entity[][] grid;
-    private int size;
     
     public Battlefield(int size, int walls, int medicalKits, int ammoKits, int barrels, FillStrategy fillStrategy) {
         super();
@@ -31,9 +33,8 @@ public class Battlefield extends AbstractListenableModel implements BattlefieldM
         this.currentHero = null;
         this.heroes = new GroupHeroesArrayList();
         this.bombs = new ArrayList<>();
-        this.grid = new Entity[size][size];
-        this.size = this.grid.length;
-        this.fillStrategy.fillGrid(this.grid, walls, medicalKits, ammoKits, barrels);
+        this.gridManager = new GridManager(size);
+        this.fillStrategy.fillGrid(this.gridManager.getGrid(), walls, medicalKits, ammoKits, barrels);
     }
     
     @Override
@@ -48,12 +49,12 @@ public class Battlefield extends AbstractListenableModel implements BattlefieldM
     
     @Override
     public Entity[][] getGrid() {
-        return this.grid;
+        return this.gridManager.getGrid();
     }
     
     @Override
     public int getSize() {
-        return this.size;
+        return this.gridManager.getSize();
     }
     
     @Override
@@ -66,7 +67,7 @@ public class Battlefield extends AbstractListenableModel implements BattlefieldM
     
     @Override
     public Hero addHero(HeroFactory factory) {
-        Hero hero = this.fillStrategy.fillGridWithHero(this.grid, factory);
+        Hero hero = this.fillStrategy.fillGridWithHero(this.gridManager.getGrid(), factory);
         this.heroes.addHero(hero);
         this.fireChange();
         return hero;
@@ -74,30 +75,34 @@ public class Battlefield extends AbstractListenableModel implements BattlefieldM
 
     @Override
     public boolean addExplosive(Hero h, String direction, String explosiveType) {
-        int[] pos = this.wichDirection(direction);
-        int x = h.getX()+pos[0];
-        int y = h.getY()+pos[1];
-        if(this.isPosition(x, y)) {
-            Entity e = this.grid[x][y];
+        int[] pos = this.gridManager.getDirectionVector(direction);
+        int x = h.getX() + pos[0];
+        int y = h.getY() + pos[1];
+        if (this.gridManager.isValidPosition(x, y)) {
+            Entity e = this.gridManager.getEntity(x, y);
             if (e == null) {
                 Explosive explosive = null;
                 if ("mine".equals(explosiveType) && h.useMine()) {
                     explosive = new Mine(x, y, h);
                 } else if ("bomb".equals(explosiveType) && h.useBomb()) {
-                    explosive = new Bomb(x, y, h);
+                    Bomb bomb = new Bomb(x, y, h);
+                    this.bombs.add(bomb);
+                    explosive = bomb;
                 }
 
                 if (explosive == null) {
                     return false;
                 } else {
-                    if (explosive instanceof Bomb) this.bombs.add((Bomb)explosive);
-                    this.grid[x][y] = explosive;
+                    this.gridManager.setEntity(x, y, explosive);
                     this.fireChange();
                     return true;
                 }
-            } else if (e instanceof Explosive) {
-                this.detonate((Explosive) e);
-                return true;
+            } else {
+                AddExplosiveVisitor visitor = new AddExplosiveVisitor(this);
+                e.accept(visitor);
+                if (visitor.isExplosive()) {
+                    return true;
+                }
             }
         }
         return false;
@@ -105,27 +110,21 @@ public class Battlefield extends AbstractListenableModel implements BattlefieldM
     
     @Override
     public boolean moveHero(Hero h, String direction) {
-        int[] pos = this.wichDirection(direction);
+        int[] pos = this.gridManager.getDirectionVector(direction);
         int x = h.getX() + pos[0];
         int y = h.getY() + pos[1];
-        if (this.isPosition(x, y)) {
-            Entity e = this.grid[x][y];
+        if (this.gridManager.isValidPosition(x, y)) {
+            Entity e = this.gridManager.getEntity(x, y);
             if (e == null) {
                 this.moveHeroToNewPosition(h, x, y);
                 return true;
-            } else if (e instanceof Explosive) {
-                if (((Explosive)e).isWalkable()) {
-                    this.detonate((Explosive) e);
-                    this.moveHeroToNewPosition(h, x, y);
-                    this.isHeroDead(h);
-                    return true;    
+            } else {
+                MoveVisitor visitor = new MoveVisitor(h, x, y, this);
+                e.accept(visitor);
+                if (visitor.hasMoved()) {
+                    return true;
                 }
-            } else if (e instanceof Consumable) {
-                ((Consumable) e).useConsumable(h);
-                this.moveHeroToNewPosition(h, x, y);
-                return true;
             }
-            return false;
         }
         return false;
     }
@@ -141,78 +140,37 @@ public class Battlefield extends AbstractListenableModel implements BattlefieldM
         return false;
     }
     
-    /**
-     * Décrémente de un le compteur des bombes et les fait exploser si nécessaire.
-     */
     public void decrementBombs() {
         for (int i = 0; i < this.bombs.size(); i++) {
             boolean state = this.bombs.get(i).decrementeTimer();
             if (state) {
                 this.detonate(this.bombs.get(i));
                 this.bombs.remove(i);
-                
             }
         }
     }
 
-    /**
-     * Détonation d'un explosif.
-     * 
-     * @param explosive est l'explosif qui va détoner.
-     */
-    private void detonate(Explosive explosive) {
-        List<Entity> entities = this.nearestNeighborsEntity(explosive.getExplosionRadius(), explosive.getX(), explosive.getY());
-        this.grid[explosive.getX()][explosive.getY()] = null;
+    void detonate(Explosive explosive) {
+        List<Entity> entities = this.gridManager.getNearestNeighbors(explosive.getExplosionRadius(), explosive.getX(), explosive.getY());
+        this.gridManager.clearCell(explosive.getX(), explosive.getY());
+        DetonateVisitor visitor = new DetonateVisitor(explosive, this);
         for (Entity entitie : entities) {
-            if (entitie instanceof Hero) {
-                explosive.explode((Hero) entitie);
-                this.isHeroDead((Hero) entitie);
-            }
+            entitie.accept(visitor);
         }
         this.fireChange();
     }
     
-    /**
-     * Recherche les entités les plus proches situés dans un rayon donné.
-     * 
-     * @param n Le rayon de recherche, exprimé en nombre de cases.
-     * @param x Coordonné horizontale du point de recherche.
-     * @param y Coordonné verticale du point de recherche.
-     * @return Une liste contenant toutes les entités répondant aux critères de proximité.
-     */
-    private List<Entity> nearestNeighborsEntity(int n, int x, int y) {
-        List<Entity> neighbors = new ArrayList<>();
-        for (int i=0; i < this.size; i++) {
-            for (int j=0; j < this.size; j++) {
-                if (this.grid[i][j] != null) {
-                    int diffX = Math.abs(this.grid[i][j].getX()-x);
-                    int diffY = Math.abs(this.grid[i][j].getY()-y);
-                    int maxi = Math.max(diffX, diffY);
-                    if (maxi <= n) {
-                        neighbors.add(this.grid[i][j]);
-                    }
-                }
-            }
-        }
-        return neighbors;
-    }
-    
     @Override
     public boolean axAttack(Hero h, String d) {
-        int[] direction = this.wichDirection(d);
-        int x = h.getX()+direction[0];
-        int y = h.getY()+direction[1];
-        if(this.isPosition(x, y)) {
-            Entity e = this.grid[x][y];
-            if (e instanceof Wall) {
-                return false;
-            } else if (e instanceof Hero) {
-                Hero hero = (Hero) e;
-                if (hero.isImmune()) return true;
-                h.axAttack(hero);
-                this.isHeroDead(hero);
-                this.fireChange();
-                return true;
+        int[] direction = this.gridManager.getDirectionVector(d);
+        int x = h.getX() + direction[0];
+        int y = h.getY() + direction[1];
+        if (this.gridManager.isValidPosition(x, y)) {
+            Entity e = this.gridManager.getEntity(x, y);
+            if (e != null) {
+                AxAttackVisitor visitor = new AxAttackVisitor(h, this);
+                e.accept(visitor);
+                return visitor.hasHit();
             }
         }
         return false;
@@ -221,87 +179,39 @@ public class Battlefield extends AbstractListenableModel implements BattlefieldM
     @Override
     public boolean shootHero(Hero h, String d) {
         h.setAmmoRemaining(h.getAmmoRemaining()-1);
-        int[] direction = this.wichDirection(d);
+        int[] direction = this.gridManager.getDirectionVector(d);
         int x = h.getX();
         int y = h.getY();
-        for (int i=0; i < this.size; i++) {
+        for (int i = 0; i < this.gridManager.getSize(); i++) {
             x += direction[0];
             y += direction[1];
-            if(this.isPosition(x, y)) {
-                Entity e = this.grid[x][y];
-                if (e instanceof Wall) {
-                    return false;
-                } else if (e instanceof Hero) {
-                    Hero hero = (Hero) e;
-                    if (hero.isImmune()) return true;
-                    h.shootHero(hero);
-                    this.isHeroDead(hero);
-                    this.fireChange();
-                    return true;
-                } else if (e instanceof Barrel) {
-                    this.detonate((Explosive)e);
-                    return true;
+            if (this.gridManager.isValidPosition(x, y)) {
+                Entity e = this.gridManager.getEntity(x, y);
+                if (e != null) {
+                    ShootHeroVisitor visitor = new ShootHeroVisitor(h, this);
+                    e.accept(visitor);
+                    if (visitor.getHitObstacle() != null) {
+                        return visitor.getHitObstacle();
+                    }
                 }
             }
         }
         return false;
     }
     
-    /**
-     * Donne le sens de direction (gauche, droite, haut, bas, etc.).
-     * 
-     * @param direction gauche, droite, haut, bas.
-     * @return un tableau contenant la direction {x,y}
-     */
-    private int[] wichDirection(String direction) {
-        switch(direction) {
-            case "left":
-                return new int[] {0, -1};
-            case "right":
-                return new int[] {0, 1};
-            case "up":
-                return new int[] {-1, 0};
-            case "down":
-                return new int[] {1, 0};
-            case "lu":
-                return new int[] {-1, -1};
-            case "ru":
-                return new int[] {-1, 1};
-            case "ld":
-                return new int[] {1, -1};
-            case "rd":
-                return new int[] {1, 1};
-            default:
-                return new int[] {0, 0};
-        }
-    }
-    
-    /**
-     * Déplace un joueur vers une nouvelle position sur la grille.
-     *
-     * @param h Le héro à déplacer.
-     * @param x Nouvelle coordonné horizontale du joueur.
-     * @param y Nouvelle coordonné verticale du joueur.
-     */
-    private void moveHeroToNewPosition(Hero h, int x, int y) {
-        this.grid[h.getX()][h.getY()] = null;
-        this.grid[x][y] = h;
+    void moveHeroToNewPosition(Hero h, int x, int y) {
+        this.gridManager.clearCell(h.getX(), h.getY());
+        this.gridManager.setEntity(x, y, h);
         h.setX(x);
         h.setY(y);
         this.fireChange();
     }
     
-    /**
-     * Supprime le joueur si il est mort.
-     * 
-     * @param h joueur a supprimer si celui-ci est mort.
-     * @return true si le joueur est mort sinon false.
-     */
-    private boolean isHeroDead(Hero h) {
+    boolean isHeroDead(Hero h) {
         if (!h.isAlive()) {
-            for (int i=0; i < this.heroes.getSize(); i++) {
+            for (int i = 0; i < this.heroes.getSize(); i++) {
                 if (this.heroes.getHero(i) == h) {
-                    this.grid[h.getX()][h.getY()] = null;
+                    this.gridManager.clearCell(h.getX(), h.getY());
                     this.fireChange();
                     return true;
                 }
@@ -313,42 +223,31 @@ public class Battlefield extends AbstractListenableModel implements BattlefieldM
 
     @Override
     public boolean isValidPosition(int x, int y) {
-        return x >= 0 && x < this.size && y >= 0 && y < this.size;
+        return this.gridManager.isValidPosition(x, y);
     }
 
-    /**
-     * Vérifie si une position donnée se trouve dans la grille.
-     *
-     * @param x Coordonnée horizontale.
-     * @param y Coordonnée verticale.
-     * @return true si la position est dans la grille, false sinon.
-     */
-    private boolean isPosition(int x, int y) {
-        return this.isValidPosition(x, y);
-    }
-
-    /**
-     * Affiche l'état actuel de la grille.
-     * 
-     * @return l'état de la grille avec toutes les entités présentes.
-     */
     @Override
     public String toString() {
         String tmp = "";
-        for (int i = 0; i < this.size; i++) {
-            for (int j = 0; j < this.size; j++) {
-                if (this.grid[i][j] == null) {
+        int size = this.gridManager.getSize();
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                Entity e = this.gridManager.getEntity(i, j);
+                if (e == null) {
                     tmp += " . ";
-                } else if (this.grid[i][j] instanceof Hero) {
-                    tmp += " " + this.grid[i][j].getEmote();
                 } else {
-                    tmp += " " + this.grid[i][j].getEmote() + " ";
+                    ToStringVisitor visitor = new ToStringVisitor();
+                    e.accept(visitor);
+                    tmp += visitor.getFormatted();
                 }
                 tmp += " ";
             }
             tmp += "\n";
         }
         return tmp;
+    }
+    void notifyChange() {
+        this.fireChange();
     }
     
 }

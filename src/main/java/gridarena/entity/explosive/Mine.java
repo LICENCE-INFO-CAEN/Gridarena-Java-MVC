@@ -1,5 +1,6 @@
 package gridarena.entity.explosive;
 
+import gridarena.entity.EntityVisitor;
 import gridarena.entity.hero.Hero;
 
 /**
@@ -17,6 +18,11 @@ public class Mine extends Explosive {
     
     public Mine(int x, int y, Hero belongsTo) {
         super(x, y, belongsTo, "☢️​", Mine.EXPLOSION_RADIUS, Mine.DAMAGES, true, "mine.png");
+    }
+
+    @Override
+    public void accept(EntityVisitor visitor) {
+        visitor.visit(this);
     }
 
     @Override

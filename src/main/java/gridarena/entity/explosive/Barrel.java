@@ -1,5 +1,7 @@
 package gridarena.entity.explosive;
 
+import gridarena.entity.EntityVisitor;
+
 /**
  * Représente un barrel explosif.
  * 
@@ -15,6 +17,11 @@ public class Barrel extends Explosive {
     
     public Barrel(int x, int y) {
         super(x, y, null, "⛽", Barrel.EXPLOSION_RADIUS, Barrel.DAMAGES, false, "barrel.png");
+    }
+
+    @Override
+    public void accept(EntityVisitor visitor) {
+        visitor.visit(this);
     }
     
     @Override

@@ -2,6 +2,8 @@ package gridarena.entity.environment;
 
 import gridarena.entity.Entity;
 
+import gridarena.entity.EntityVisitor;
+
 /**
  * Représente un mur.
  * 
@@ -12,6 +14,11 @@ public class Wall extends Entity {
     
     public Wall(int x, int y) {
         super(x, y, "️█​", "wall.png", false);
+    }
+
+    @Override
+    public void accept(EntityVisitor visitor) {
+        visitor.visit(this);
     }
 
     @Override

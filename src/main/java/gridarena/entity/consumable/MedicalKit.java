@@ -1,5 +1,6 @@
 package gridarena.entity.consumable;
 
+import gridarena.entity.EntityVisitor;
 import gridarena.entity.hero.Hero;
 
 /**
@@ -15,6 +16,11 @@ public class MedicalKit extends Consumable {
     
     public MedicalKit(int x, int y) {
         super(x, y, "❤️​", true, "health.png");
+    }
+
+    @Override
+    public void accept(EntityVisitor visitor) {
+        visitor.visit(this);
     }
 
     /**

@@ -55,6 +55,8 @@ public abstract class Entity extends AbstractListenableModel {
         this.fireChange();
     }
 
+    public abstract void accept(EntityVisitor visitor);
+
     @Override
     public String toString() {
         return "Entité ("+this.x+", "+this.y+") :\n";
