@@ -17,8 +17,8 @@ public class GameConfigValidator {
      */
     public static void validate(GameConfig config) throws IllegalArgumentException {
         int totalPlayers = config.getGuiPlayers() + config.getCliPlayers() + config.getBotPlayers();
-        if (totalPlayers == 0) {
-            throw new IllegalArgumentException("Il faut au moins 1 joueur pour lancer une partie !");
+        if (totalPlayers < 2) {
+            throw new IllegalArgumentException("Il faut au moins 2 joueurs pour lancer une partie !");
         }
         if (totalPlayers * 2 > config.getGridSize()) {
             throw new IllegalArgumentException("Trop de joueurs pour la taille de grille choisie (règle : joueurs * 2 <= taille grille).");

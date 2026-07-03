@@ -7,29 +7,34 @@ import gridarena.entity.explosive.Barrel;
 import gridarena.entity.hero.Hero;
 import gridarena.entity.hero.HeroFactory;
 
-import java.util.*;
+import java.util.Random;
 
 /**
- * Représente la stratégie avec un pattern prédéfini.
+ * Représente la stratégie avec un pattern en croix.
  * 
  * @author Florian Pépin.
  * @version 1.0
  */
-public class PatternFillStrategy implements FillStrategy {
-    
+public class CrossFillStrategy implements FillStrategy {
+
     @Override
     public void fillGrid(Entity[][] grid, int walls, int medicalKits, int ammoKits, int barrels) {
         int size = grid.length;
-        int center = size/2;
-        int[][] posMedAmmo = {{0,0},{0, size-1},{size-1, 0},{size-1,size-1},{0,1},{0, size-2},{size-1, 1},{size-1,size-2}};
+        int center = size / 2;
+        int[][] posMedAmmo = {
+            {0, 0}, {0, size - 1}, {size - 1, 0}, {size - 1, size - 1},
+            {0, 1}, {0, size - 2}, {size - 1, 1}, {size - 1, size - 2}
+        };
+
         grid[center][center] = new Barrel(center, center);
+
         for (int i = 0; i < size; i++) {
-            if (i != center && i != center-1 && i != center+1) {
+            if (i != center && i != center - 1 && i != center + 1) {
                 grid[center][i] = new Wall(center, i);
             }
         }
         for (int j = 0; j < size; j++) {
-            if (j != center && j != center-1 && j != center+1) {
+            if (j != center && j != center - 1 && j != center + 1) {
                 grid[j][center] = new Wall(j, center);
             }
         }
@@ -45,10 +50,12 @@ public class PatternFillStrategy implements FillStrategy {
     @Override
     public Hero fillGridWithHero(Entity[][] grid, HeroFactory factory) {
         Random random = new Random();
+        int size = grid.length;
         int x = random.nextInt(grid.length);
         int y = random.nextInt(grid[0].length);
-        while(true) {
-            if (grid[x][y] == null) {
+        while (true) {
+            if (grid[x][y] == null && (x != 0 && y != 0) && (x != 0 && y != size - 1) 
+                && (x != size - 1 && y != 0) && (x != size - 1 && y != size - 1)) {
                 Hero hero = factory.createHero(x, y);
                 grid[x][y] = hero;
                 return hero;
@@ -58,5 +65,5 @@ public class PatternFillStrategy implements FillStrategy {
             }
         }
     }
-    
+
 }

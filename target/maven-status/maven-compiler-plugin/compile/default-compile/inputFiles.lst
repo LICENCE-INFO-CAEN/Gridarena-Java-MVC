@@ -6,7 +6,6 @@
 /home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/controller/bot/AStarBotStrategy.java
 /home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/model/GameConfig.java
 /home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/entity/hero/package-info.java
-/home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/model/fillgrid/PatternFillStrategy.java
 /home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/entity/environment/package-info.java
 /home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/view/LeaderboardView.java
 /home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/controller/ActionController.java
@@ -28,6 +27,7 @@
 /home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/entity/hero/WarriorFactory.java
 /home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/view/UITheme.java
 /home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/entity/explosive/Bomb.java
+/home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/model/fillgrid/RingsFillStrategy.java
 /home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/controller/state/BombState.java
 /home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/controller/command/ShootCommand.java
 /home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/entity/hero/GroupHeroes.java
@@ -44,7 +44,6 @@
 /home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/view/cli/package-info.java
 /home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/controller/state/AxAttackState.java
 /home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/entity/hero/CustomHero.java
-/home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/model/fillgrid/RandomFillStrategy.java
 /home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/controller/bot/BotStrategy.java
 /home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/entity/explosive/Barrel.java
 /home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/entity/hero/HeroFactory.java
@@ -58,6 +57,7 @@
 /home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/utils/AbstractListenableModel.java
 /home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/entity/hero/Hero.java
 /home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/entity/hero/GroupHeroesToTableModelAdapter.java
+/home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/model/fillgrid/PillarsFillStrategy.java
 /home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/model/fillgrid/FillStrategy.java
 /home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/model/BattlefieldProxy.java
 /home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/model/Battlefield.java
@@ -71,6 +71,7 @@
 /home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/model/BattlefieldModel.java
 /home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/controller/package-info.java
 /home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/controller/command/ActivateShieldCommand.java
+/home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/model/fillgrid/CrossFillStrategy.java
 /home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/utils/ListenableModel.java
 /home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/controller/state/MineState.java
 /home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/view/package-info.java
@@ -79,6 +80,5 @@
 /home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/model/GameConfigValidator.java
 /home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/controller/command/AxAttackCommand.java
 /home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/model/package-info.java
-/home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/model/fillgrid/ModuloFillStrategy.java
 /home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/entity/consumable/AmmoKit.java
 /home/florian/GitHub/Gridarena-Java-MVC/src/main/java/gridarena/view/StatisticView.java

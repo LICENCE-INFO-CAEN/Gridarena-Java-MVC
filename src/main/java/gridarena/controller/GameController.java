@@ -10,6 +10,8 @@ import gridarena.view.cli.*;
 
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
+import java.util.function.Consumer;
+import javax.swing.SwingUtilities;
 
 /**
  * Représente le contrôleur mère du jeu.
@@ -29,6 +31,11 @@ public class GameController implements Runnable {
     private volatile boolean running = true;
     private Thread gameThread;
     private CountDownLatch heroSelectionLatch;
+    private Consumer<String> onGameFinishedCallback;
+
+    public void setOnGameFinished(Consumer<String> callback) {
+        this.onGameFinishedCallback = callback;
+    }
     
     public GameController(boolean showOverview, int guiPlayers, int cliPlayers, int botPlayers, int sizeGrid, int walls, int medicalKits, int ammoKits, int barrels, FillStrategy fillStrategy) {
         this.battlefield = new Battlefield(sizeGrid, walls, medicalKits, ammoKits, barrels, fillStrategy);
@@ -138,9 +145,6 @@ public class GameController implements Runnable {
      * @param currentPlayer indice du joueur qui vient de jouer. 
      */
     private void nextTurn(int currentPlayer) {
-        GroupHeroesArrayList heroes = this.battlefield.getHeroes();
-        int previousPlayer = currentPlayer == 0 ? heroes.getSize()-1 : currentPlayer-1;
-        if (heroes.getHero(previousPlayer).isImmune()) heroes.getHero(previousPlayer).setImmune(false);
         this.battlefield.decrementBombs();
         this.removePlayer();
     }
@@ -200,7 +204,12 @@ public class GameController implements Runnable {
         
         // Phase 2 : Déroulement du jeu au tour par tour
         while (this.playersCounter > 1 && this.running) {
-            this.battlefield.setCurrentHero(this.findPlayer(this.players.get(this.currentPlayer)));
+            int heroIndex = this.findPlayer(this.players.get(this.currentPlayer));
+            Hero currentHero = this.battlefield.getHeroes().getHero(heroIndex);
+            if (currentHero.isImmune()) {
+                currentHero.setImmune(false);
+            }
+            this.battlefield.setCurrentHero(heroIndex);
             this.players.get(this.currentPlayer).takeMyTurn();
             if (!this.running) break;
             this.nextTurn(this.currentPlayer);
@@ -212,6 +221,17 @@ public class GameController implements Runnable {
         if (this.running) {
             for (Player player : this.playersHistory) {
                 player.showLeaderboard();
+                if (player instanceof PlayerGUI) {
+                    ((PlayerGUI) player).disposeFrame();
+                }
+            }
+            if (this.onGameFinishedCallback != null) {
+                String winnerName = null;
+                if (this.players.size() == 1) {
+                    winnerName = this.players.get(0).getName();
+                }
+                final String finalWinner = winnerName;
+                SwingUtilities.invokeLater(() -> this.onGameFinishedCallback.accept(finalWinner));
             }
         }
     }

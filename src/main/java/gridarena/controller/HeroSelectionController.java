@@ -36,6 +36,7 @@ public class HeroSelectionController extends JPanel {
     private JButton btnShieldPlus, btnShieldMinus;
     private JButton btnMinePlus, btnMineMinus;
     private JButton btnBombPlus, btnBombMinus;
+    private JButton btnCreateCustom;
     
     public HeroSelectionController(BattlefieldModel battlefield, GameController game, PlayerGUI playerGUI) {
         super(new BorderLayout(15, 15));
@@ -202,7 +203,7 @@ public class HeroSelectionController extends JPanel {
 
         customPanel.add(statsPanel, BorderLayout.CENTER);
 
-        JButton btnCreateCustom = createStyledButton("CRÉER MON HÉROS", UITheme.ACCENT);
+        btnCreateCustom = createStyledButton("CRÉER MON HÉROS", UITheme.ACCENT);
         btnCreateCustom.setForeground(UITheme.TEXT_PRIMARY);
         btnCreateCustom.setFont(UITheme.FONT_SUBTITLE);
         btnCreateCustom.addActionListener(e -> {
@@ -326,6 +327,8 @@ public class HeroSelectionController extends JPanel {
 
         btnBombMinus.setEnabled(ptsBomb > 0);
         btnBombPlus.setEnabled(pointsLeft > 0);
+
+        btnCreateCustom.setEnabled(pointsLeft == 0);
     }
     
     private void finishSelection() {

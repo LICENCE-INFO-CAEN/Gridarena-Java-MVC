@@ -8,6 +8,7 @@ import gridarena.view.BattlefieldView;
 import gridarena.view.UITheme;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 
 /**
@@ -129,7 +130,7 @@ public class AdminPanel extends JFrame {
 
         // Section Stratégies
         comboBotStrategy  = createCombo("A* Pathfinding", "Dijkstra", "Greedy BFS");
-        comboFillStrategy = createCombo("Pattern", "Random", "Modulo");
+        comboFillStrategy = createCombo("Pattern - Cross", "Pattern - Pillars", "Pattern - Rings");
 
         JPanel stratSection = createGridSection(2, new JComponent[][]{
             {makeLabel("Strat. bot"),   comboBotStrategy},
@@ -353,9 +354,28 @@ public class AdminPanel extends JFrame {
         statsTable.setRowHeight(24);
         statsTable.setShowHorizontalLines(true);
         statsTable.setShowVerticalLines(false);
-        statsTable.getTableHeader().setBackground(UITheme.ACCENT);
-        statsTable.getTableHeader().setForeground(UITheme.TEXT_PRIMARY);
-        statsTable.getTableHeader().setFont(UITheme.FONT_LABEL);
+        
+        // Centrage du texte des cellules
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+        for (int i = 0; i < statsTable.getColumnCount(); i++) {
+            statsTable.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+        }
+
+        // Centrage et stylisation des entêtes de colonnes
+        DefaultTableCellRenderer headerRenderer = new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value,
+                    boolean isSelected, boolean hasFocus, int row, int column) {
+                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                setHorizontalAlignment(SwingConstants.CENTER);
+                setBackground(UITheme.ACCENT);
+                setForeground(UITheme.TEXT_PRIMARY);
+                setFont(UITheme.FONT_LABEL);
+                return this;
+            }
+        };
+        statsTable.getTableHeader().setDefaultRenderer(headerRenderer);
 
         JScrollPane scroll = new JScrollPane(statsTable);
         scroll.setPreferredSize(new Dimension(0, 110));
@@ -384,5 +404,9 @@ public class AdminPanel extends JFrame {
 
     public void showError(String title, String message) {
         JOptionPane.showMessageDialog(this, message, title, JOptionPane.ERROR_MESSAGE);
+    }
+
+    public void showInfo(String title, String message) {
+        JOptionPane.showMessageDialog(this, message, title, JOptionPane.INFORMATION_MESSAGE);
     }
 }

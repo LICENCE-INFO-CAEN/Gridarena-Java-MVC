@@ -1,8 +1,6 @@
 gridarena/view/gui/PlayerFrame.class
 gridarena/view/gui/AdminPanel$2.class
-gridarena/model/fillgrid/ModuloFillStrategy.class
 gridarena/view/gui/PlayerGUI.class
-gridarena/model/fillgrid/RandomFillStrategy.class
 gridarena/entity/hero/GroupHeroes.class
 gridarena/entity/explosive/Bomb.class
 gridarena/controller/bot/AStarBotStrategy$Node.class
@@ -12,11 +10,11 @@ gridarena/controller/state/ShootState.class
 gridarena/entity/explosive/Mine.class
 gridarena/entity/hero/CustomHero.class
 gridarena/entity/consumable/Consumable.class
-gridarena/model/fillgrid/PatternFillStrategy.class
 gridarena/view/LeaderboardView.class
 gridarena/utils/ModelListener.class
 gridarena/model/GameConfig.class
 gridarena/entity/explosive/Explosive.class
+gridarena/view/gui/AdminPanel$5.class
 gridarena/view/StatisticView.class
 gridarena/model/Battlefield.class
 gridarena/model/BattlefieldProxy.class
@@ -65,12 +63,14 @@ gridarena/controller/AdminController.class
 gridarena/model/BattlefieldModel.class
 gridarena/view/package-info.class
 gridarena/entity/hero/AssassinFactory.class
+gridarena/model/fillgrid/RingsFillStrategy.class
 gridarena/controller/HeroSelectionController.class
 gridarena/model/fillgrid/FillStrategy.class
 gridarena/controller/bot/package-info.class
 gridarena/entity/hero/Hero.class
 gridarena/controller/command/AddExplosiveCommand.class
 gridarena/entity/hero/WarriorFactory.class
+gridarena/model/fillgrid/PillarsFillStrategy.class
 gridarena/entity/consumable/AmmoKit.class
 gridarena/controller/state/BombState.class
 gridarena/controller/state/MineState.class
@@ -85,6 +85,7 @@ gridarena/Main.class
 gridarena/entity/hero/DefaultHero.class
 gridarena/controller/state/MoveState.class
 gridarena/entity/hero/package-info.class
+gridarena/model/fillgrid/CrossFillStrategy.class
 gridarena/controller/bot/DijkstraBotStrategy.class
 gridarena/controller/command/ShootCommand.class
 gridarena/entity/hero/MastodonteFactory.class

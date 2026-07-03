@@ -60,6 +60,19 @@ public class AdminController {
         refreshTimer = new Timer(200, evt -> view.refreshStatsTable());
         refreshTimer.start();
 
+        gameController.setOnGameFinished(winnerName -> {
+            if (refreshTimer != null) {
+                refreshTimer.stop();
+            }
+            view.setControlState(false);
+            view.displayWaitingScreen();
+            if (winnerName != null) {
+                view.showInfo("Fin de partie", "La partie est terminée !\nLe gagnant est : " + winnerName);
+            } else {
+                view.showInfo("Fin de partie", "La partie est terminée !\nÉgalité (aucun survivant).");
+            }
+        });
+
         gameController.demarrer(botStrategy);
     }
 
@@ -78,12 +91,12 @@ public class AdminController {
     }
 
     private FillStrategy resolveFillStrategy(String name) {
-        if ("Random".equalsIgnoreCase(name)) {
-            return new RandomFillStrategy();
-        } else if ("Modulo".equalsIgnoreCase(name)) {
-            return new ModuloFillStrategy();
+        if ("Pattern - Pillars".equalsIgnoreCase(name)) {
+            return new PillarsFillStrategy();
+        } else if ("Pattern - Rings".equalsIgnoreCase(name)) {
+            return new RingsFillStrategy();
         }
-        return new PatternFillStrategy();
+        return new CrossFillStrategy();
     }
 
     private BotStrategy resolveBotStrategy(String name) {
