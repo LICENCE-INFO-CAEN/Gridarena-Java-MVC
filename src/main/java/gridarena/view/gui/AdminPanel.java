@@ -23,10 +23,6 @@ public class AdminPanel extends JFrame {
     private final AdminController controller;
 
     private JSpinner spinGridSize;
-    private JSpinner spinWalls;
-    private JSpinner spinMedKits;
-    private JSpinner spinAmmoKits;
-    private JSpinner spinBarrels;
     private JSpinner spinGuiPlayers;
     private JSpinner spinCliPlayers;
     private JSpinner spinBotPlayers;
@@ -96,17 +92,9 @@ public class AdminPanel extends JFrame {
 
         // Section Carte
         spinGridSize = createSpinner(10, 5, 30);
-        spinWalls    = createSpinner(5,  0, 50);
-        spinMedKits  = createSpinner(3,  0, 50);
-        spinAmmoKits = createSpinner(3,  0, 50);
-        spinBarrels  = createSpinner(3,  0, 50);
 
         JPanel gridSection = createGridSection(2, new JComponent[][]{
-            {makeLabel("Taille grille"), spinGridSize},
-            {makeLabel("Murs"),          spinWalls},
-            {makeLabel("Kits soin"),     spinMedKits},
-            {makeLabel("Kits munitions"),spinAmmoKits},
-            {makeLabel("Barils"),        spinBarrels}
+            {makeLabel("Taille grille"), spinGridSize}
         });
         sidebar.add(makeBadge("PARAMÈTRES CARTE"));
         sidebar.add(Box.createRigidArea(new Dimension(0, 8)));
@@ -305,10 +293,10 @@ public class AdminPanel extends JFrame {
     public GameConfig getSelectedConfig() {
         return new GameConfig(
                 (Integer) spinGridSize.getValue(),
-                (Integer) spinWalls.getValue(),
-                (Integer) spinMedKits.getValue(),
-                (Integer) spinAmmoKits.getValue(),
-                (Integer) spinBarrels.getValue(),
+                0,
+                0,
+                0,
+                0,
                 (Integer) spinGuiPlayers.getValue(),
                 (Integer) spinCliPlayers.getValue(),
                 (Integer) spinBotPlayers.getValue(),
@@ -321,10 +309,6 @@ public class AdminPanel extends JFrame {
         btnStart.setEnabled(!isRunning);
         btnStop.setEnabled(isRunning);
         spinGridSize.setEnabled(!isRunning);
-        spinWalls.setEnabled(!isRunning);
-        spinMedKits.setEnabled(!isRunning);
-        spinAmmoKits.setEnabled(!isRunning);
-        spinBarrels.setEnabled(!isRunning);
         spinGuiPlayers.setEnabled(!isRunning);
         spinCliPlayers.setEnabled(!isRunning);
         spinBotPlayers.setEnabled(!isRunning);

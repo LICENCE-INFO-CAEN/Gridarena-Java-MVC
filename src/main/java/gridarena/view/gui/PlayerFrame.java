@@ -44,8 +44,9 @@ public class PlayerFrame extends JFrame {
         this.setVisible(true);
     }
     
-    public void setBorderColorGUI(Color color) {
-        this.getRootPane().setBorder(BorderFactory.createMatteBorder(3, 3, 3, 3, color));
+    public void updateTurnBorder(boolean isMyTurn) {
+        Color borderColor = isMyTurn ? UITheme.SUCCESS : UITheme.ACCENT;
+        this.getRootPane().setBorder(BorderFactory.createMatteBorder(3, 3, 3, 3, borderColor));
     }
     
     public void showLeaderboard() {

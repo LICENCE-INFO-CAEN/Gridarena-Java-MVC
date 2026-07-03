@@ -11,25 +11,6 @@
 
 Les joueurs (humains, CLI ou bots intelligents) s'affrontent sur une grille bidimensionnelle parsemée d'obstacles et de bonus, en utilisant diverses compétences tactiques (tir, hache, bombes, mines, bouclier).
 
----
-
-## Architecture et Design Patterns
-
-Ce projet sert de démonstrateur pour l'application pratique des patrons de conception logicielle :
-- **MVC (Modèle-Vue-Contrôleur)** : Séparation stricte de l'état du jeu (Modèle), de l'affichage (Vue GUI/CLI) et des actions utilisateur (Contrôleurs).
-- **Observer (Observateur)** : Utilisé pour notifier automatiquement les vues lorsque l'état du champ de bataille change.
-- **Proxy (Interface-based)** : Un proxy restreint l'accès à la grille complète pour chaque joueur, appliquant le brouillard de guerre (les mines ennemies sont invisibles).
-- **Adapter (Adaptateur)** : Utilisé pour adapter le groupe de héros (`GroupHeroes`) en modèle de tableau compatible avec l'affichage Swing (`TableModel`).
-- **Factory Method** : Création découplée des spécialisations de héros (`Assassin`, `Warrior`, `Mastodonte`) via des classes fabriques dédiées.
-- **Strategy** :
-  - **Remplissage de la grille** (`Random`, `Modulo`, `Pattern`).
-  - **Intelligence des robots** utilisant des algorithmes de recherche de chemin :
-    - **A\* Search** ($f(n) = g(n) + h(n)$) pour un déplacement optimal.
-    - **Dijkstra** ($f(n) = g(n)$) pour une exploration exhaustive.
-    - **Greedy Best-First** ($f(n) = h(n)$) pour un comportement agressif à courte vue.
-
----
-
 ## Captures d'Écran
 
 ### Vue du Joueur (Brouillard de guerre)

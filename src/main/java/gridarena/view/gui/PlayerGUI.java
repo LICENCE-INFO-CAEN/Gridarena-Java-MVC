@@ -4,7 +4,6 @@ import gridarena.controller.GameController;
 import gridarena.model.BattlefieldModel;
 import gridarena.view.Player;
 
-import java.awt.Color;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.SynchronousQueue;
 
@@ -54,11 +53,7 @@ public class PlayerGUI implements Player {
     
     public void setMyTurn(boolean state) {
         this.myTurn = state;
-        if (state) {
-            this.frame.setBorderColorGUI(Color.GREEN);
-        } else {
-            this.frame.setBorderColorGUI(Color.BLACK);
-        }
+        this.frame.updateTurnBorder(state);
     }
     
     @Override
