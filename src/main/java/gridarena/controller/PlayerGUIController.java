@@ -1,7 +1,5 @@
-package gridarena.controller.gui;
+package gridarena.controller;
 
-import gridarena.controller.GameController;
-import gridarena.controller.Player;
 import gridarena.model.BattlefieldModel;
 import gridarena.view.gui.PlayerFrame;
 

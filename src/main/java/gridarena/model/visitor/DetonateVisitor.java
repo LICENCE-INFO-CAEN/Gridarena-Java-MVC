@@ -1,4 +1,4 @@
-package gridarena.model;
+package gridarena.model.visitor;
 
 import gridarena.entity.EntityVisitor;
 import gridarena.entity.consumable.AmmoKit;
@@ -6,28 +6,25 @@ import gridarena.entity.consumable.MedicalKit;
 import gridarena.entity.environment.Wall;
 import gridarena.entity.explosive.Barrel;
 import gridarena.entity.explosive.Bomb;
+import gridarena.entity.explosive.Explosive;
 import gridarena.entity.explosive.Mine;
 import gridarena.entity.hero.Hero;
+import gridarena.model.Battlefield;
 
 /**
- * Visiteur gérant l'application d'une attaque à la hache sur la cible.
+ * Visiteur gérant l'application des dégâts d'une explosion sur les entités proches.
  *
  * @author Florian Pépin.
  * @version 1.0
  */
-public class AxAttackVisitor implements EntityVisitor {
+public class DetonateVisitor implements EntityVisitor {
     
-    private final Hero attacker;
+    private final Explosive explosive;
     private final Battlefield battlefield;
-    private boolean hit = false;
 
-    public AxAttackVisitor(Hero attacker, Battlefield battlefield) {
-        this.attacker = attacker;
+    public DetonateVisitor(Explosive explosive, Battlefield battlefield) {
+        this.explosive = explosive;
         this.battlefield = battlefield;
-    }
-
-    public boolean hasHit() {
-        return this.hit;
     }
 
     @Override
@@ -49,14 +46,8 @@ public class AxAttackVisitor implements EntityVisitor {
     public void visit(Barrel barrel) {}
 
     @Override
-    public void visit(Hero victim) {
-        if (victim.isImmune()) {
-            this.hit = true;
-            return;
-        }
-        attacker.axAttack(victim);
-        battlefield.isHeroDead(victim);
-        battlefield.notifyChange();
-        this.hit = true;
+    public void visit(Hero hero) {
+        explosive.explode(hero);
+        battlefield.isHeroDead(hero);
     }
 }

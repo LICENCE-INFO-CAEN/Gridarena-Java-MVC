@@ -1,7 +1,5 @@
-package gridarena.controller.cli;
+package gridarena.controller;
 
-import gridarena.controller.GameController;
-import gridarena.controller.Player;
 import gridarena.controller.command.*;
 import gridarena.entity.hero.*;
 import gridarena.model.*;

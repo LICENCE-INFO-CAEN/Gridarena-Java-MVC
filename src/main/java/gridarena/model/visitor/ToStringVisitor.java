@@ -1,4 +1,4 @@
-package gridarena.model;
+package gridarena.model.visitor;
 
 import gridarena.entity.EntityVisitor;
 import gridarena.entity.consumable.AmmoKit;

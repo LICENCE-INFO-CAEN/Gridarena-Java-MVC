@@ -8,7 +8,6 @@ import gridarena.entity.hero.Hero;
 import gridarena.model.BattlefieldModel;
 import gridarena.utils.ModelListener;
 import gridarena.view.UITheme;
-import gridarena.controller.gui.PlayerGUIController;
 import gridarena.controller.command.*;
 import gridarena.controller.state.*;
 import java.awt.event.KeyEvent;

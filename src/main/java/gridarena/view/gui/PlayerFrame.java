@@ -9,7 +9,7 @@ import gridarena.view.LeaderboardView;
 import gridarena.view.StatisticView;
 import gridarena.view.UITheme;
 
-import gridarena.controller.gui.PlayerGUIController;
+import gridarena.controller.PlayerGUIController;
 
 import javax.swing.*;
 import java.awt.*;

@@ -6,6 +6,7 @@ import gridarena.entity.environment.Wall;
 import gridarena.entity.explosive.*;
 import gridarena.entity.hero.*;
 import gridarena.model.fillgrid.*;
+import gridarena.model.visitor.*;
 import gridarena.utils.AbstractListenableModel;
 
 import java.util.*;
@@ -150,7 +151,7 @@ public class Battlefield extends AbstractListenableModel implements BattlefieldM
         }
     }
 
-    void detonate(Explosive explosive) {
+    public void detonate(Explosive explosive) {
         List<Entity> entities = this.gridManager.getNearestNeighbors(explosive.getExplosionRadius(), explosive.getX(), explosive.getY());
         this.gridManager.clearCell(explosive.getX(), explosive.getY());
         DetonateVisitor visitor = new DetonateVisitor(explosive, this);
@@ -199,7 +200,7 @@ public class Battlefield extends AbstractListenableModel implements BattlefieldM
         return false;
     }
     
-    void moveHeroToNewPosition(Hero h, int x, int y) {
+    public void moveHeroToNewPosition(Hero h, int x, int y) {
         this.gridManager.clearCell(h.getX(), h.getY());
         this.gridManager.setEntity(x, y, h);
         h.setX(x);
@@ -207,7 +208,7 @@ public class Battlefield extends AbstractListenableModel implements BattlefieldM
         this.fireChange();
     }
     
-    boolean isHeroDead(Hero h) {
+    public boolean isHeroDead(Hero h) {
         if (!h.isAlive()) {
             for (int i = 0; i < this.heroes.getSize(); i++) {
                 if (this.heroes.getHero(i) == h) {
@@ -246,7 +247,7 @@ public class Battlefield extends AbstractListenableModel implements BattlefieldM
         }
         return tmp;
     }
-    void notifyChange() {
+    public void notifyChange() {
         this.fireChange();
     }
     

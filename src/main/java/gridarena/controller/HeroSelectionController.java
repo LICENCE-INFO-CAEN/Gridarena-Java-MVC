@@ -1,7 +1,6 @@
 package gridarena.controller;
 
 import gridarena.model.BattlefieldModel;
-import gridarena.controller.gui.PlayerGUIController;
 import gridarena.entity.hero.HeroFactory;
 import gridarena.entity.hero.CustomHeroFactory;
 import gridarena.view.UITheme;

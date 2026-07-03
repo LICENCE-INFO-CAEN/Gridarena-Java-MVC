@@ -1,7 +1,6 @@
-package gridarena.controller.bot;
+package gridarena.controller;
 
-import gridarena.controller.GameController;
-import gridarena.controller.Player;
+import gridarena.controller.bot.BotStrategy;
 import gridarena.model.BattlefieldModel;
 
 /**

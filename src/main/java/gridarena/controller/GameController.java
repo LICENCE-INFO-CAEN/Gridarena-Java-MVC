@@ -1,8 +1,6 @@
 package gridarena.controller;
 
 import gridarena.controller.bot.*;
-import gridarena.controller.cli.PlayerCLIController;
-import gridarena.controller.gui.PlayerGUIController;
 import gridarena.entity.hero.*;
 import gridarena.model.*;
 import gridarena.model.fillgrid.*;

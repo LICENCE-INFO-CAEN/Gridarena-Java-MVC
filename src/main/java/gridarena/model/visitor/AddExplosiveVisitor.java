@@ -1,4 +1,4 @@
-package gridarena.model;
+package gridarena.model.visitor;
 
 import gridarena.entity.EntityVisitor;
 import gridarena.entity.consumable.AmmoKit;
@@ -8,6 +8,7 @@ import gridarena.entity.explosive.Barrel;
 import gridarena.entity.explosive.Bomb;
 import gridarena.entity.explosive.Mine;
 import gridarena.entity.hero.Hero;
+import gridarena.model.Battlefield;
 
 /**
  * Visiteur gérant la détection et détonation d'un explosif existant lorsqu'on essaie d'en poser un nouveau.
