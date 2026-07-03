@@ -8,16 +8,14 @@ Les joueurs s'affrontent sur une grille bidimensionnelle parsemée d'obstacles e
 
 ## Captures d'Écran
 
-### Vue du Joueur (Brouillard de guerre)
+### Vue du joueur
 ![vue-joueur](./screenshots/vue-joueur.png)
 
-### Vue Panel Admin (Arbitre / Spectateur)
+### Vue du panel admin
 ![vue-panel-admin](./screenshots/panel-admin.png)
 
-### Sélection du Personnage
+### Sélection du personnage
 ![choisir personnage](./screenshots/choisir-personnage.png)
-
----
 
 ## Règles du Jeu
 
@@ -31,8 +29,6 @@ Les joueurs s'affrontent sur une grille bidimensionnelle parsemée d'obstacles e
 - **Passer son tour**.
 
 La grille contient initialement des obstacles destructibles (**barils explosifs**), des **murs**, des **kits de soins** (+PV) et des **boîtes de munitions**.
-
----
 
 ## Comment Lancer l'Application
 
@@ -49,23 +45,6 @@ Vous pouvez lancer le jeu directement via Maven :
 ```bash
 mvn exec:java
 ```
-
-Ou exécuter le JAR généré :
-```bash
-cd target
-java -jar gridarena-1.0-SNAPSHOT.jar
-```
-
----
-
-## Configuration du Jeu
-
-Le comportement du jeu est configurable dans le fichier [config.properties](file:///home/florian/GitHub/Gridarena-Java-MVC/src/main/resources/resources/config.properties) (ou sa copie générée dans `target/config.properties`) :
-- **Nombre de joueurs** : `GUI_PLAYERS`, `CLI_PLAYERS`, `BOT_PLAYERS`.
-- **Paramètres de grille** : `SIZE_GRID`, `WALLS`, `MEDICAL_KITS`, `AMMO_KITS`, `BARRELS`.
-- **Stratégie de l'IA (bot)** : `BOT_STRATEGY` (`astar`, `dijkstra`, `greedy`).
-
----
 
 ## Crédits des Images
 
