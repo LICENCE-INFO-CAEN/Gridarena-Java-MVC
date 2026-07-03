@@ -1,0 +1,267 @@
+\documentclass[12pt, a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+
+\geometry{hmargin=2.5cm, vmargin=2.5cm}
+
+\begin{document}
+
+% --- Page de garde ---
+\begin{titlepage}
+    \centering
+    % Logo de l'université
+    \includegraphics[width=0.4\textwidth]{univ-caen.jpg}\par\vspace{1.5cm}
+    
+    {\scshape\Large Université de Caen Normandie \par}
+    \vspace{0.5cm}
+    {\scshape\large UFR des Sciences \par}
+    \vspace{1.5cm}
+    
+    {\scshape\large Architecture Logicielle \par}
+    \vspace{1cm}
+    
+    \rule{\linewidth}{0.5mm} \\[0.4cm]
+    {\huge \bfseries Rapport de projet \\[0.4cm] }
+    {\large \bfseries Grid Arena }
+    \rule{\linewidth}{0.5mm} \\[1.5cm]
+    
+    \begin{minipage}{\textwidth}
+        \centering \large
+        \emph{Auteurs :}\\
+        Florian \textsc{Pépin}\\
+        Tom \textsc{David}
+    \end{minipage}
+    
+    \vfill
+    
+    {\large Mai 2025 \par}
+\end{titlepage}
+
+% --- Table des matières ---
+\tableofcontents
+\newpage
+
+% --- Sections du document ---
+\section{Design Pattern : Observer}
+\subsection{Motivation}
+
+
+\subsection{Correspondance des acteurs}
+
+
+\section{Design Pattern : Proxy}
+\subsection{Motivation}
+
+
+\subsection{Correspondance des acteurs}
+
+
+\section{Design Pattern : Adapter}
+\subsection{Motivation}
+
+
+\subsection{Correspondance des acteurs}
+
+
+\section{Design Pattern : State}
+\subsection{Motivation}
+
+
+\subsection{Correspondance des acteurs}
+
+
+\section{Design Pattern : Command}
+\subsection{Motivation}
+
+
+\subsection{Correspondance des acteurs}
+
+
+\section{Design Pattern : Strategy}
+\subsection{Motivation}
+
+
+\subsection{Correspondance des acteurs}
+
+
+\section{Design Pattern : Method Factory}
+\subsection{Motivation}
+
+
+\subsection{Correspondance des acteurs}
+
+
+\section{Bilan concernant les principes d'architecture vus en cours}
+
+\newpage
+\appendix
+\section{Inventaire des entités par paquetage}
+Cette annexe liste l'ensemble des classes et interfaces du projet regroupées par paquetage.
+
+\subsection{Paquetage : gridarena}
+\begin{tabular}{|p{7cm}|p{8cm}|}
+\hline
+\textbf{Entité} & \textbf{Rôle} \\ \hline
+Main & Point d'entrée de l'application, gère l'initialisation et le lancement. \\ \hline
+\end{tabular}
+
+\subsection{Paquetage : gridarena.controller}
+\begin{tabular}{|p{7cm}|p{8cm}|}
+\hline
+\textbf{Entité} & \textbf{Rôle} \\ \hline
+ActionController & Gère la saisie des actions de l'utilisateur pendant son tour. \\ \hline
+AdminController & Gère le cycle de vie de la partie depuis l'administration. \\ \hline
+GameController & Gère la boucle de jeu principale au tour par tour. \\ \hline
+HeroSelectionController & Gère la personnalisation des caractéristiques des héros. \\ \hline
+\end{tabular}
+
+\subsection{Paquetage : gridarena.controller.bot}
+\begin{tabular}{|p{7cm}|p{8cm}|}
+\hline
+\textbf{Entité} & \textbf{Rôle} \\ \hline
+PlayerBot & Joueur robot virtuel contrôlé par une stratégie d'IA. \\ \hline
+BotStrategy & Interface commune définissant le comportement d'un bot. \\ \hline
+AStarBotStrategy & Stratégie d'IA basée sur l'algorithme A*. \\ \hline
+DijkstraBotStrategy & Stratégie d'IA basée sur l'algorithme de Dijkstra. \\ \hline
+GreedyBotStrategy & Stratégie d'IA gloutonne maximisant le gain immédiat. \\ \hline
+\end{tabular}
+
+\subsection{Paquetage : gridarena.controller.command}
+\begin{tabular}{|p{7cm}|p{8cm}|}
+\hline
+\textbf{Entité} & \textbf{Rôle} \\ \hline
+Command & Interface du patron Commande encapsulant une action. \\ \hline
+MoveCommand & Commande pour déplacer un héros. \\ \hline
+ShootCommand & Commande pour effectuer un tir à distance. \\ \hline
+AddExplosiveCommand & Commande pour poser un explosif (bombe ou mine). \\ \hline
+ActivateShieldCommand & Commande pour activer le bouclier (immunité). \\ \hline
+AxAttackCommand & Commande pour attaquer au corps-à-corps à la hache. \\ \hline
+PassCommand & Commande pour passer son tour de jeu. \\ \hline
+\end{tabular}
+
+\subsection{Paquetage : gridarena.controller.state}
+\begin{tabular}{|p{7cm}|p{8cm}|}
+\hline
+\textbf{Entité} & \textbf{Rôle} \\ \hline
+ControllerState & Interface d'état pour adapter les actions selon le mode actif. \\ \hline
+MoveState & État correspondant au mode de déplacement. \\ \hline
+ShootState & État correspondant au mode de tir. \\ \hline
+MineState & État correspondant au mode de pose de mines. \\ \hline
+BombState & État correspondant au mode de lancer de bombes. \\ \hline
+ShieldState & État correspondant au mode d'activation du bouclier. \\ \hline
+AxAttackState & État correspondant au mode d'attaque au corps-à-corps. \\ \hline
+\end{tabular}
+
+\subsection{Paquetage : gridarena.entity}
+\begin{tabular}{|p{7cm}|p{8cm}|}
+\hline
+\textbf{Entité} & \textbf{Rôle} \\ \hline
+Entity & Classe abstraite de base pour tous les objets placés sur la grille. \\ \hline
+\end{tabular}
+
+\subsection{Paquetage : gridarena.entity.consumable}
+\begin{tabular}{|p{7cm}|p{8cm}|}
+\hline
+\textbf{Entité} & \textbf{Rôle} \\ \hline
+Consumable & Classe abstraite de base pour les objets consommables. \\ \hline
+AmmoKit & Trousse apportant des munitions supplémentaires. \\ \hline
+MedicalKit & Trousse restaurant les points de vie du héros. \\ \hline
+\end{tabular}
+
+\subsection{Paquetage : gridarena.entity.environment}
+\begin{tabular}{|p{7cm}|p{8cm}|}
+\hline
+\textbf{Entité} & \textbf{Rôle} \\ \hline
+Wall & Obstacle fixe, infranchissable et indestructible. \\ \hline
+\end{tabular}
+
+\subsection{Paquetage : gridarena.entity.explosive}
+\begin{tabular}{|p{7cm}|p{8cm}|}
+\hline
+\textbf{Entité} & \textbf{Rôle} \\ \hline
+Explosive & Classe abstraite de base pour les objets explosifs. \\ \hline
+Barrel & Baril explosif fixe, déclenché à distance par un tir. \\ \hline
+Mine & Mine posée au sol, explose lors du passage d'un adversaire. \\ \hline
+Bomb & Bombe à retardement, explose après un nombre de tours donné. \\ \hline
+\end{tabular}
+
+\subsection{Paquetage : gridarena.entity.hero}
+\begin{tabular}{|p{7cm}|p{8cm}|}
+\hline
+\textbf{Entité} & \textbf{Rôle} \\ \hline
+Hero & Classe abstraite représentant un héros combattant. \\ \hline
+HeroFactory & Interface de fabrique pour instancier des héros. \\ \hline
+DefaultHero / DefaultHeroFactory & Héros standard aux statistiques équilibrées. \\ \hline
+Warrior / WarriorFactory & Héros spécialisé dans le corps-à-corps. \\ \hline
+Assassin / AssassinFactory & Héros rapide et discret infligeant de gros dégâts. \\ \hline
+Mastodonte / MastodonteFactory & Héros très robuste, lourdement armé et blindé. \\ \hline
+CustomHero / CustomHeroFactory & Héros personnalisé dont les statistiques sont définies par le joueur. \\ \hline
+GroupHeroes & Interface listant la collection globale de héros. \\ \hline
+GroupHeroesArrayList & Implémentation concrète de la collection de héros. \\ \hline
+GroupHeroesEditable & Interface de modification de la liste de héros. \\ \hline
+GroupHeroesToTableModelAdapter & Adaptateur reliant la liste de héros à un JTable. \\ \hline
+\end{tabular}
+
+\subsection{Paquetage : gridarena.model}
+\begin{tabular}{|p{7cm}|p{8cm}|}
+\hline
+\textbf{Entité} & \textbf{Rôle} \\ \hline
+BattlefieldModel & Interface d'exposition de l'état du terrain de jeu. \\ \hline
+Battlefield & Modèle central orchestrant les règles et l'arène. \\ \hline
+BattlefieldProxy & Proxy appliquant le brouillard de guerre spécifique à un héros. \\ \hline
+GameConfig & Conteneur des configurations de départ d'une partie. \\ \hline
+GameConfigValidator & Validateur de cohérence des données de configuration. \\ \hline
+\end{tabular}
+
+\subsection{Paquetage : gridarena.model.fillgrid}
+\begin{tabular}{|p{7cm}|p{8cm}|}
+\hline
+\textbf{Entité} & \textbf{Rôle} \\ \hline
+FillStrategy & Interface de stratégie de génération de la grille. \\ \hline
+CrossFillStrategy & Génère un motif d'obstacles en forme de croix. \\ \hline
+PillarsFillStrategy & Génère des obstacles sous forme de piliers séparés. \\ \hline
+RingsFillStrategy & Génère des obstacles sous forme de cercles concentriques. \\ \hline
+\end{tabular}
+
+\subsection{Paquetage : gridarena.utils}
+\begin{tabular}{|p{7cm}|p{8cm}|}
+\hline
+\textbf{Entité} & \textbf{Rôle} \\ \hline
+ListenableModel & Interface de modèle émettant des notifications de mise à jour. \\ \hline
+AbstractListenableModel & Base d'implémentation pour la gestion des écouteurs. \\ \hline
+ModelListener & Interface réceptrice pour les notifications du modèle. \\ \hline
+\end{tabular}
+
+\subsection{Paquetage : gridarena.view}
+\begin{tabular}{|p{7cm}|p{8cm}|}
+\hline
+\textbf{Entité} & \textbf{Rôle} \\ \hline
+Player & Classe représentant un joueur de manière générale (humain ou bot). \\ \hline
+BattlefieldView & Composant de dessin du terrain de jeu. \\ \hline
+LeaderboardView & Écran affichant le classement final des joueurs. \\ \hline
+StatisticView & Composant d'affichage des statistiques de jeu. \\ \hline
+UITheme & Palette de couleurs et styles du thème de l'application. \\ \hline
+\end{tabular}
+
+\subsection{Paquetage : gridarena.view.cli}
+\begin{tabular}{|p{7cm}|p{8cm}|}
+\hline
+\textbf{Entité} & \textbf{Rôle} \\ \hline
+PlayerCLI & Représente un joueur humain interagissant en mode console. \\ \hline
+\end{tabular}
+
+\subsection{Paquetage : gridarena.view.gui}
+\begin{tabular}{|p{7cm}|p{8cm}|}
+\hline
+\textbf{Entité} & \textbf{Rôle} \\ \hline
+AdminPanel & Interface de pilotage et d'affichage des statistiques globales (HQ). \\ \hline
+PlayerFrame & Fenêtre de jeu principale d'un joueur graphique. \\ \hline
+PlayerGUI & Représente un joueur humain interagissant via l'interface graphique. \\ \hline
+\end{tabular}
+
+\end{document}
